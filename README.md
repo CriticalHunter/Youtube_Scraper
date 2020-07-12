@@ -13,7 +13,7 @@ This project does the following tasks
 2. Asks if user wants to scrape an entire channel or just a Youtube playlist
 3. Stores relevant data in corresponding tables
     1. For entire channel it will store
-        1. Channel details in tb_channels ![tb_channels](/Assets/CHannel_id_user.jpg)
+        1. Channel details in tb_channels
         2. All playlists created by the channel in tb_playlists 
         3. Videos in those playlist may/may not be uploaded by the channel. (e.g. it may be a playlist of compiled videos of other users)
         4. In that case, videos will have their original data as uploaded by original account
@@ -21,8 +21,8 @@ This project does the following tasks
     2. For single playlist it will store
         1. Only video data in tb_videos
         
-## Guide
-Below is a detailed guide on using this.
+## Setup Guide
+Below is a detailed guide on setting up the environment.
 
 ### Youtube API
 First you need to have you Youtube API key. Below is a link of a video, that will guide you. **Watch from 0:00 - 5:30**
@@ -59,28 +59,39 @@ virtualenv <your-env>
 <your-env>\Scripts\activate
 <your-env>\Scripts\pip.exe install google-api-python-client
 ```
-### Working Guide
+## Working Guide
 
 Run the program YT_data.py
 
 The script will ask for required data in the command line and is pretty self-explanatory (Once it runs)
 
-#### Case 1 - Scraping Entire Channel, when Channel ID is known
+### Case 1 - Scraping Entire Channel, when Channel ID is known
 
 ![example_1.1](/Assets/example_1.1.jpg)
 ![example_1.2](/Assets/example_1.2.jpg) ![example_1.3](/Assets/example_1.3.jpg)
 ![example_1.4](/Assets/example_1.4.jpg) ![example_1.5](/Assets/example_1.5.jpg)
 ![example_1.6](/Assets/example_1.6.jpg) ![example_1.7](/Assets/example_1.7.jpg)
 
-#### Case 2 - Scraping Entire Channel, when Channel name is known (ID is preferable-Case 1)
+### Case 2 - Scraping Entire Channel, when Channel name is known (ID is preferable-Case 1)
 
 ![example_1.1](/Assets/example_1.1.2.jpg)
 ![example_1.2](/Assets/example_1.5.2.jpg) ![example_1.3](/Assets/example_1.5.3.jpg)
 
-#### Case 3 - Scraping a single Playlist
+### Case 3 - Scraping a single Playlist
 
 ![example_1.1](/Assets/example_2.1.jpg)
 ![example_1.2](/Assets/example_2.2.jpg)
 
+## Database (in DB Browser) sample results
+### Database Schema
+![example_0.1](/Assets/example_0.1.jpg)
+### tb_channels Table
+![example_0.2](/Assets/example_0.2.jpg)
+### tb_playlists Table
+![example_0.3](/Assets/example_0.3.jpg)
+### tb_videos Table
+![example_0.4](/Assets/example_0.4.jpg)
+
+![example_0.5](/Assets/example_0.5.jpg)
 
 
