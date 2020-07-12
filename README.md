@@ -1,7 +1,15 @@
-# Youtube_stats
+# Youtube_scrape
+<img src="https://github.com/CriticalHunter/Youtube_Scraper/blob/master/Assets/title.jpg" >
+<p align="center" style="text-align: center;">
+<a href="https://lbesson.mit-license.org">
+  <img alt="MIT license"
+       src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square"
+       align="center">
+<a href="https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FCriticalHunter%2FYoutube_stats.git"><img alt="Twitter" src="https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2FCriticalHunter%2FYoutube_Scraper.git"></a>
+    
 Scrape data about an entire Channel or just a Playlist, using Youtube API. No OAuth is required.
 
-## Details
+## :heavy_check_mark: Features
 This project does the following tasks
 
 1. Creates a database for storing all the data
@@ -21,7 +29,7 @@ This project does the following tasks
     2. For single playlist it will store
         1. Only video data in tb_videos
         
-## Setup Guide
+## :computer: Setup Guide
 Below is a detailed guide on setting up the environment.
 
 ### Youtube API
@@ -59,39 +67,29 @@ virtualenv <your-env>
 <your-env>\Scripts\activate
 <your-env>\Scripts\pip.exe install google-api-python-client
 ```
+
+
 ## Working Guide
 
 Run the program YT_data.py
 
 The script will ask for required data in the command line and is pretty self-explanatory (Once it runs)
 
-### Case 1 - Scraping Entire Channel, when Channel ID is known
-
-![example_1.1](/Assets/example_1.1.jpg)
-![example_1.2](/Assets/example_1.2.jpg) ![example_1.3](/Assets/example_1.3.jpg)
-![example_1.4](/Assets/example_1.4.jpg) ![example_1.5](/Assets/example_1.5.jpg)
-![example_1.6](/Assets/example_1.6.jpg) ![example_1.7](/Assets/example_1.7.jpg)
-
-### Case 2 - Scraping Entire Channel, when Channel name is known (ID is preferable-Case 1)
-
-![example_1.1](/Assets/example_1.1.2.jpg)
-![example_1.2](/Assets/example_1.5.2.jpg) ![example_1.3](/Assets/example_1.5.3.jpg)
-
-### Case 3 - Scraping a single Playlist
-
-![example_1.1](/Assets/example_2.1.jpg)
-![example_1.2](/Assets/example_2.2.jpg)
-
-## Database (in DB Browser) sample results
-### Database Schema
-![example_0.1](/Assets/example_0.1.jpg)
-### tb_channels Table
-![example_0.2](/Assets/example_0.2.jpg)
-### tb_playlists Table
-![example_0.3](/Assets/example_0.3.jpg)
-### tb_videos Table
-![example_0.4](/Assets/example_0.4.jpg)
-
-![example_0.5](/Assets/example_0.5.jpg)
+Else, look the [step-by-step Guide](https://github.com/CriticalHunter/Youtube_Scraper/blob/master/Step-By-Step.md)
 
 
+## :hearts: Contributing
+There are several ways to help. 
+
+1. **Spread the word:** More users means more possible people testing and contributing to the app which in turn means better stability and possibly more and better features. You can [![Twitter](https://img.shields.io/twitter/url?style=social&url=https%3A%2F%2Fgithub.com%2FCriticalHunter%2FYoutube_Scraper.git)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FCriticalHunter%2FYoutube_stats.git) or share it on [LinkedIn](http://www.linkedin.com/shareArticle?mini=true&url=https://github.com/CriticalHunter/Youtube_Scraper.git). Every little bit helps ! 
+
+2. **[Make a feature or improvement request](https://github.com/CriticalHunter/Youtube_Scraper/issues/new)**: Something can be be done better? Something essential missing? Let us know! 
+
+3. **[Report bugs](https://github.com/CriticalHunter/Youtube_Scraper/issues/new)**
+
+4. **Contribute**: You don't have to be programmer to help. 
+     1. **Treat Me A Coffee Instead** [Paypal](https://paypal.me/CriticalHunter23)
+
+
+### Pull Requests 
+**Pull requests** are of course very welcome! Please make sure to also include the issue number in your commit message, if you're fixing a particular issue (e.g.: `feat: add nice feature with the number #31`).
