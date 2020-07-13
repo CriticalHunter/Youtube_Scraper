@@ -50,6 +50,8 @@ def get_channel_id(ch_name):
         else:
             sub_count = sub_count + ' Subscribers'
         ch_id = response['items'][0]['id']
+        
+        print(" ")
         print(sub_count)
         return ch_id
     except KeyError:
@@ -59,7 +61,7 @@ def get_channel_id(ch_name):
 
 
 
-def get_videos_stats(video_ids,playlistID = None):
+def get_videos_stats(video_ids,flag,playlistID = None):
     global youtube
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -78,10 +80,12 @@ def get_videos_stats(video_ids,playlistID = None):
         Video_id = video['id']
         Video_title = video['snippet']['title']
         Upload_playlistId = video['snippet']['channelId']
+        
         try:
             Playlist_Id = video['snippet']['playlistId']
         except:
-            Playlist_Id = playlistID
+            Playlist_Id = playlistID                                    # When call is grom a playlist
+            
         Published_At = video['snippet']['publishedAt']
         Channel_Id = video['snippet']['channelId']
         Channel_Title = video['snippet']['channelTitle']
@@ -107,7 +111,10 @@ def get_videos_stats(video_ids,playlistID = None):
             Comment_Count = 0
             
         params = (Video_id,Video_title,Upload_playlistId,Playlist_Id,Published_At,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Favorite_Count,Comment_Count)
-        cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? )", params)
+        if flag == 1:
+            cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? )", params)
+        else:
+            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? )", params)
 
     conn.commit()                                               # Push the data into database
     conn.close()
@@ -117,7 +124,7 @@ def get_channel_details(channel_id):
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
     
-    print(api_key)
+
     request = youtube.channels().list(part="snippet,statistics",
                                       id=channel_id
                                       ).execute()
@@ -176,7 +183,7 @@ def get_playlist_videos(playlistID):
     conn.commit()                                               # Push the data into database
     conn.close()
     
-    get_videos_stats(video_IDS,playlistID)
+    get_videos_stats(video_IDS,1,playlistID)
 
     
 
@@ -227,7 +234,9 @@ def get_channel_playlists(channel_id):
 
 def get_channel_videos(channel_id):
     global youtube
-    
+    conn = sqlite3.connect('youtube.db')              
+    cur = conn.cursor()
+
     res = youtube.channels().list(id=channel_id, 
                                   part='contentDetails').execute()
     
@@ -235,7 +244,8 @@ def get_channel_videos(channel_id):
     
     videos = []
     next_page_token = None
-    
+    new_video_ids = []
+
     while 1:
         res = youtube.playlistItems().list(playlistId=playlist_id, 
                                            part='snippet', 
@@ -250,8 +260,17 @@ def get_channel_videos(channel_id):
         if next_page_token is None:
             break
 
-    print('Parsing ',len(video_ids),' videos, which are not in playlist')
-    get_videos_stats(video_ids)
+    for newVid in video_ids:
+        cur.execute("SELECT Video_id FROM tb_videos WHERE Video_id=?",(newVid,))
+        if cur.fetchone():
+            pass
+        else:
+            new_video_ids.append(newVid)
+    conn.commit()                                               # Push the data into database
+    conn.close()
+
+    print('\nParsing ',len(new_video_ids),' videos, which are not in any playlist')
+    get_videos_stats(video_ids,flag=0)
 
 
 
@@ -259,11 +278,12 @@ def entire_channel(ch_id):
     get_channel_details(ch_id)
     playlists_list = get_channel_playlists(ch_id)
     count = 0
-    print('There are ',len(playlists_list),' original/imported playlists')
+    print('\nThere are ',len(playlists_list),' original/imported playlists\n')
     for playlist in playlists_list:
         count += 1
+        print('\nParsing playlist ',count)
         get_playlist_videos(playlist)
-        print('Parsing playlist ',count)
+        
         count1 = 0
     get_channel_videos(ch_id)
 
