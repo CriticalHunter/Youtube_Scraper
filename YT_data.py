@@ -18,7 +18,7 @@ key = input()
 get_api_key(key)
 
 
-print("Do you want to scrape a channel or just a playlist? (Enter 1 for channel, 2 for playlist)")
+print("\nDo you want to scrape a channel or just a playlist? (Enter 1 for channel, 2 for playlist)")
 choice = input("Enter either '1' or '2' \n")
 
 if choice == '1':
@@ -34,7 +34,7 @@ if choice == '1':
             ch_name = input("Please enter the channel Name -  ")
             ch_id = get_channel_id(ch_name)
             print('\n Check the subscriber count and decide if the program detects the correct channel')
-            k = input('please enter (Y/N)')
+            k = input('please enter (Y/N)  ')
             if k == 'y' or k == 'Y':
                 break
             else:
