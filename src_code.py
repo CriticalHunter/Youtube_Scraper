@@ -3,6 +3,8 @@ from googleapiclient.discovery import build
 from datetime import datetime, timedelta
 import sqlite3, time
 from bs4 import BeautifulSoup
+import argparse
+import sys
 
 global count1
 global api_key, youtube
@@ -90,39 +92,8 @@ def get_api_key(key):
     global api_key,youtube
     api_key = key
     youtube = build('youtube','v3',developerKey=api_key)
-
+    return youtube
 # get_api_key('Your API Key')
-
-
-def oldest_videos_on_a_topic(topic,Max_limit=10):
-    print('\n')
-    print('Video ID','\t','Upload Date/Time','\t','Video Title')
-    print('--------','\t','----------------','\t','-----------')
-    limit = 0
-    global youtube
-    start_time = datetime(year=2005, month=4, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
-    end_time = datetime(year=2010, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-    res = youtube.search().list(part='snippet',
-                            q=topic,
-                            type='video',
-                            publishedAfter=start_time,
-                            publishedBefore=end_time,
-                            maxResults=50).execute()
-    for item in sorted(res['items'], key=lambda x:x['snippet']['publishedAt']):
-        title = str(item['snippet']['title']).replace('&#39;',"'").replace('&quot;','"')
-        if topic.lower() in title.lower():
-            limit += 1
-            date_format = "%Y-%m-%dT%H:%M:%SZ" 
-            publishedAt = datetime.strptime(item['snippet']['publishedAt'], date_format)
-            print(item['id']['videoId'],'\t',publishedAt,'\t', title )
-            if limit == Max_limit:
-                break
-        else:
-            continue
-        
-    print('\n')
-
 
 
 
@@ -261,7 +232,7 @@ def get_videos_stats(video_ids,flag,playlistID = None):
         return tot_len
 
 
-def get_channel_playlists(channel_id):
+def get_channel_playlists(channel_id,single=False,playlistID=''):
     global youtube
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -281,19 +252,21 @@ def get_channel_playlists(channel_id):
         
 
         for playlist in playlists:
+            Playlist_ID = playlist['id']                    ;   playlist_ids.append(Playlist_ID)
+            if (single == True and playlist['id'] == playlistID) or single == False:
 
-            Playlist_ID = playlist['id']                    ;   playlist_ids.append(Playlist_ID) 
-            Playlist_title = playlist['snippet']['title']
-            Channel_Id = playlist['snippet']['channelId']
-            Channel_Title = playlist['snippet']['channelTitle']
-            Published_At = playlist['snippet']['publishedAt']
-            Item_Count = playlist['contentDetails']['itemCount']
-            Playlist_Seconds = 0
-            Playlist_Duration = '0'
-            Is_Seen = 0                     # 0 = not seen    1 = seen
-            Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
-            params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Item_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
-            cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", params)
+                 
+                Playlist_title = playlist['snippet']['title']
+                Channel_Id = playlist['snippet']['channelId']
+                Channel_Title = playlist['snippet']['channelTitle']
+                Published_At = playlist['snippet']['publishedAt']
+                Item_Count = playlist['contentDetails']['itemCount']
+                Playlist_Seconds = 0
+                Playlist_Duration = '0'
+                Is_Seen = 0                     # 0 = not seen    1 = seen
+                Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
+                params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Item_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
+                cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", params)
         if next_page_token is None:
             break
     
@@ -308,7 +281,7 @@ def get_channel_playlists(channel_id):
     return playlist_ids
 
 ''' get_channel_details() and  entire_channel(ch_id) use  get_channel_playlists '''
-def get_channel_details(channel_id):
+def get_channel_details(channel_id,single=False,playlistID=''):
     global youtube
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -339,7 +312,7 @@ def get_channel_details(channel_id):
     conn.commit()                                               # Push the data into database
     conn.close()
 
-    get_channel_playlists(Channel_Id)
+    get_channel_playlists(Channel_Id,single,playlistID)
 
 
 
@@ -370,15 +343,17 @@ def get_playlist_videos(playlistID):
     for video in videos:
             
             Video_id = video['snippet']['resourceId']['videoId'];   video_IDS.append(Video_id)
-
-            params = (Video_id,"","","","","","")
-            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ?, 0,0,0,0,0,'',0,0,0,0)", params)    
+            ch_ID = video['snippet']['channelId']
+            params = (Video_id,"",0,0,"","","")
+            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0)", params)    
 
         
     print('Videos in this playlist =',len(video_IDS))
     conn.commit()                                               # Push the data into database
     conn.close()
     
+    get_channel_details(ch_ID,True,playlistID)
+
     Playlist_Seconds = get_videos_stats(video_IDS,1,playlistID)
     Playlist_Duration = str(timedelta(seconds = Playlist_Seconds))
     conn = sqlite3.connect('youtube.db')              
@@ -489,11 +464,12 @@ def entire_channel(ch_id):
     get_channel_videos(ch_id)
 
 # entire_channel('UCJQJ4GjTiq5lmn8czf8oo0Q')
-def just_playlist(playlist_id):
-    get_playlist_videos(playlist_id)
 
 
-create_new()
-temp = input("Enter API KEY \n")
-get_api_key(temp)
-oldest_videos_on_a_topic("game of thrones")
+if __name__ == "__main__":
+    
+    create_new()
+    temp = input("Enter API KEY \n")
+    get_api_key(temp)
+    # get_channel_details('UCJQJ4GjTiq5lmn8czf8oo0Q')
+    get_playlist_videos('PLZHQObOWTQDP5CVelJJ1bNDouqrAhVPev')
