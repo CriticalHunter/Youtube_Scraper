@@ -1,9 +1,10 @@
-from src_code import entire_channel, just_playlist, get_channel_id, get_api_key
-from sqlite_create import create_new
+from src_code import entire_channel, just_playlist, get_channel_id, get_api_key, create_new
+
 
 while True:
     print("Do you want to create a new Database?")
-    response = input("Enter  (Y/N) ")
+    # response = input("Enter  (Y/N) ")
+    response = 'n'
     if response == 'Y' or response == 'y':
         create_new()
         break
@@ -15,11 +16,13 @@ while True:
 
 print("Please enter your Youtube API key ")
 key = input()
+
 get_api_key(key)
 
 
 print("\nDo you want to scrape a channel or just a playlist? (Enter 1 for channel, 2 for playlist)")
-choice = input("Enter either '1' or '2' \n")
+# choice = input("Enter either '1' or '2' \n")
+choice = '1'
 
 if choice == '1':
     print("\n\nProceed with channel ID or Name, (Enter 1 for ID, 2 for name) ")
