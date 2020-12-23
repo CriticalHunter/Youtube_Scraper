@@ -91,10 +91,10 @@ def get_api_key(key):
     api_key = key
     youtube = build('youtube','v3',developerKey=api_key)
 
-get_api_key('AIzaSyBSumleKJ1eLSsTcMxXH2szgB_OCOXnslg')
+# get_api_key('Your API Key')
 
 
-def oldest_videos_on_a_topic(topic):
+def oldest_videos_on_a_topic(topic,MaxResults=10):
     global youtube
     start_time = datetime(year=2005, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
     end_time = datetime(year=2008, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -104,10 +104,11 @@ def oldest_videos_on_a_topic(topic):
                             type='video',
                             publishedAfter=start_time,
                             publishedBefore=end_time,
-                            maxResults=15).execute()
+                            maxResults=MaxResults).execute()
     for item in sorted(res['items'], key=lambda x:x['snippet']['publishedAt']):
+
         print(item['snippet']['title'], item['snippet']['publishedAt'], item['id']['videoId'])
-    #print(res)
+
 
 
 
@@ -459,13 +460,8 @@ def load_history():
         conn.commit()                                               # Push the data into database
         conn.close()
 
-    def freq():
-        conn = sqlite3.connect('youtube.db')              
-        cur = conn.cursor()
 
-        
 
-load_history()
 
 def entire_channel(ch_id):
     get_channel_details(ch_id)
@@ -476,11 +472,14 @@ def entire_channel(ch_id):
         count += 1
         print('\nParsing playlist ',count)
         get_playlist_videos(playlist)
-        
-        count1 = 0
     get_channel_videos(ch_id)
 
 # entire_channel('UCJQJ4GjTiq5lmn8czf8oo0Q')
 def just_playlist(playlist_id):
     get_playlist_videos(playlist_id)
 
+
+create_new()
+temp = input("Enter API KEY \n")
+get_api_key(temp)
+oldest_videos_on_a_topic("Tesla",2)
