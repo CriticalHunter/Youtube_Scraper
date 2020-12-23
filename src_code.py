@@ -94,20 +94,34 @@ def get_api_key(key):
 # get_api_key('Your API Key')
 
 
-def oldest_videos_on_a_topic(topic,MaxResults=10):
+def oldest_videos_on_a_topic(topic,Max_limit=10):
+    print('\n')
+    print('Video ID','\t','Upload Date/Time','\t','Video Title')
+    print('--------','\t','----------------','\t','-----------')
+    limit = 0
     global youtube
-    start_time = datetime(year=2005, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
-    end_time = datetime(year=2008, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
+    start_time = datetime(year=2005, month=4, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
+    end_time = datetime(year=2010, month=1, day=1).strftime('%Y-%m-%dT%H:%M:%SZ')
 
     res = youtube.search().list(part='snippet',
                             q=topic,
                             type='video',
                             publishedAfter=start_time,
                             publishedBefore=end_time,
-                            maxResults=MaxResults).execute()
+                            maxResults=50).execute()
     for item in sorted(res['items'], key=lambda x:x['snippet']['publishedAt']):
-
-        print(item['snippet']['title'], item['snippet']['publishedAt'], item['id']['videoId'])
+        title = str(item['snippet']['title']).replace('&#39;',"'").replace('&quot;','"')
+        if topic.lower() in title.lower():
+            limit += 1
+            date_format = "%Y-%m-%dT%H:%M:%SZ" 
+            publishedAt = datetime.strptime(item['snippet']['publishedAt'], date_format)
+            print(item['id']['videoId'],'\t',publishedAt,'\t', title )
+            if limit == Max_limit:
+                break
+        else:
+            continue
+        
+    print('\n')
 
 
 
@@ -482,4 +496,4 @@ def just_playlist(playlist_id):
 create_new()
 temp = input("Enter API KEY \n")
 get_api_key(temp)
-oldest_videos_on_a_topic("Tesla",2)
+oldest_videos_on_a_topic("game of thrones")
