@@ -3,16 +3,13 @@ import re
 import six
 import os
 
-from pyfiglet import Figlet
+from pyfiglet import Figlet, figlet_format
 from pprint import pprint
-from PyInquirer import style_from_dict, Token, prompt
-from PyInquirer import Validator, ValidationError
-from pyfiglet import figlet_format
-
+from PyInquirer import style_from_dict, Token, prompt, Validator, ValidationError
 from termcolor import colored
 import argparse
 
-from src_code import entire_channel, just_playlist, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos
+from src_code import entire_channel, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos
 
 
 
