@@ -9,7 +9,7 @@ from PyInquirer import style_from_dict, Token, prompt, Validator, ValidationErro
 from termcolor import colored
 import argparse
 
-from src_code import entire_channel, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos
+from src_code import entire_channel, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos, most_watched
 
 
 
@@ -67,7 +67,7 @@ questions = [
         'type': 'list',
         'name': 'operation',
         'message': 'What do you want to do?',
-        'choices': ['Find oldest videos on a topic', 'Scrape a Channel','scrape a single playlist' ,'Load Your History'],
+        'choices': ['Find oldest videos on a topic', 'Scrape a Channel','scrape a single playlist' ,'Load Your History','Most Watched Video'],
         'filter': lambda val: val.lower()
     },
     {
@@ -111,4 +111,10 @@ elif answers['operation'] == 'scrape a single playlist':
 
 elif answers['operation'] == 'load your history':
     load_history()
+
+elif answers['operation'] == 'most watched video':
+    print("If your watch history is not loaded in database, it will give empty result")
+    print("Please enter, How many items to retrieve e.g. 10 for Top 10 \n")
+    n = int(input())
+    most_watched(n)
 
