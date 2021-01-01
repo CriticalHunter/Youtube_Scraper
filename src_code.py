@@ -298,6 +298,7 @@ def get_channel_playlists(channel_id,single=False,playlistID=''):
 ''' get_channel_details() and  entire_channel(ch_id) use  get_channel_playlists '''
 def get_channel_details(channel_id,single=False,playlistID=''):
     global youtube
+    
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
     
@@ -336,6 +337,7 @@ def get_channel_details(channel_id,single=False,playlistID=''):
 ''' get_playlist_videos(playlistID) takes only a single Playlist ID as string  '''
 def get_playlist_videos(playlistID):
     global youtube
+    ch_ID = 'skip'
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
 
@@ -358,7 +360,10 @@ def get_playlist_videos(playlistID):
     for video in videos:
             
             Video_id = video['snippet']['resourceId']['videoId'];   video_IDS.append(Video_id)
-            ch_ID = video['snippet']['channelId']
+            try:
+                ch_ID = video['snippet']['channelId']
+            except:
+                ch_ID = 'skip'
             params = (Video_id,"",0,0,"","","")
             cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0,0)", params)    
 
@@ -367,16 +372,19 @@ def get_playlist_videos(playlistID):
     conn.commit()                                               # Push the data into database
     conn.close()
     
-    get_channel_details(ch_ID,True,playlistID)
+    if ch_ID == 'skip':
+        return 0
+    else:
+        get_channel_details(ch_ID,True,playlistID)
 
-    Playlist_Seconds = get_videos_stats(video_IDS,1,playlistID)
-    Playlist_Duration = str(timedelta(seconds = Playlist_Seconds))
-    conn = sqlite3.connect('youtube.db')              
-    cur = conn.cursor()
-    cur.execute("UPDATE tb_playlists SET Playlist_Seconds = ? WHERE playlist_ID = ? ",(Playlist_Seconds,playlistID))
-    cur.execute("UPDATE tb_playlists SET Playlist_Duration = ? WHERE playlist_ID = ? ",(Playlist_Duration,playlistID))
-    conn.commit()                                               # Push the data into database
-    conn.close()
+        Playlist_Seconds = get_videos_stats(video_IDS,1,playlistID)
+        Playlist_Duration = str(timedelta(seconds = Playlist_Seconds))
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor()
+        cur.execute("UPDATE tb_playlists SET Playlist_Seconds = ? WHERE playlist_ID = ? ",(Playlist_Seconds,playlistID))
+        cur.execute("UPDATE tb_playlists SET Playlist_Duration = ? WHERE playlist_ID = ? ",(Playlist_Duration,playlistID))
+        conn.commit()                                               # Push the data into database
+        conn.close()
     
 
 
@@ -571,7 +579,7 @@ def entire_channel(ch_id):
     print('\nThere are ',len(playlists_list),' original/imported playlists\n')
     for playlist in playlists_list:
         count += 1
-        print('\nParsing playlist ',count)
+        print('\nParsing playlist ',count,' \ ',len(playlists_list))
         get_playlist_videos(playlist)
     get_channel_videos(ch_id)
 
