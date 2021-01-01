@@ -151,11 +151,20 @@ def get_videos_stats(video_ids,flag,playlistID = None):
         Video_title = video['snippet']['title']
         Upload_playlistId = video['snippet']['channelId']
         
-        try:
-            Playlist_Id = video['snippet']['playlistId']
-        except:
-            Playlist_Id = playlistID                                    # When call is grom a playlist
-            
+        if playlistID is not None:
+            Playlist_Id = playlistID                                    # When call is from a playlist
+        else:
+            cur.execute("SELECT Playlist_ID FROM tb_videos WHERE Video_ID = ?" ,(Video_id,))
+            result = cur.fetchone()
+            if result is None:
+                Playlist_Id = None
+            else:
+                if type(result) is tuple:
+                    Playlist_Id = result[0]
+                elif type(result) is str:
+                    Playlist_Id = result
+                else:
+                    Playlist_Id = None
         Published_At = video['snippet']['publishedAt']
         date_format = "%Y-%m-%dT%H:%M:%SZ" 
         epoch = float(time.mktime(time.strptime(Published_At, date_format)))
@@ -219,7 +228,10 @@ def get_videos_stats(video_ids,flag,playlistID = None):
             Is_Licensed = 0 
         Is_Seen = 0                     # 0 = not seen    1 = seen
         Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
-        Is_Deleted = 0
+        if flag == 1:
+            Is_Deleted = 0
+        elif flag == 2:
+            Is_Deleted = 1
         params = (Video_id,Video_title,Is_Seen,Worth,Upload_playlistId,Playlist_Id,Published_At,epoch,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Upvote_Ratio,Comment_Count,Duration,video_seconds,Is_Licensed,Is_Deleted)
         if flag == 1:
             cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?)", params)
@@ -431,19 +443,18 @@ def most_watched(n=5):
 def early_views(n=5):
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
-    cur.execute("SELECT video_history.Video_ID, video_history.epoch -tb_videos.epoch As diff,video_history.epoch,tb_videos.epoch,tb_videos.Published_At, Watched_at FROM video_history \
-                    LEFT OUTER JOIN tb_videos on tb_videos.Video_id = video_history.Video_ID WHERE diff is not null GROUP BY video_history.Video_ID ORDER BY diff ASC ;")
+    cur.execute("SELECT video_history.Video_ID, video_history.epoch -tb_videos.epoch As diff,video_history.epoch,tb_videos.epoch,tb_videos.Video_title,tb_videos.epoch, Watched_at FROM video_history \
+                    LEFT OUTER JOIN tb_videos on tb_videos.Video_id = video_history.Video_ID WHERE diff > 0 GROUP BY video_history.Video_ID ORDER BY diff ASC ;")
     results = cur.fetchmany(n)
-    print("\t","  Video Link","\t","\t","\t","   Difference in Seconds","\t","\t"," Published AT (UTC)","\t","\t"," Watched AT (IST)")
+    print("Video ID","      Diff in Min","\t","Published AT(UTC)"," Watched AT (IST)","\tVideo Title")
     print("-------------------------------------------------------------------------------------------------------")
     for result in results:
-        Link = "https://www.youtube.com/watch?v="+result[0]
-        diff = int(result[1])-19800
-        if diff < 0:
-            cmnt = "This video is reuploaded after you have seen it"
-        else:
-            cmnt = ''
-        print(Link,'\t',diff,'\t',result[2],'\t',result[3],cmnt)
+        Link = result[0]
+        differ = (int(result[1])-19800)/60
+        differ1 = ("{:6d}".format(int(differ//1)))
+        differ2 = ("{:.2f}".format(differ % 1)).replace('0.','.')
+        differ = differ1+differ2
+        print(Link,'\t',differ,'\t',result[2],'\t',result[3],'\t',result[4])
     conn.commit()                                               
     conn.close()   
 
@@ -464,6 +475,24 @@ def update_is_in_main():
     conn.commit()                                               
     conn.close()
 
+def update_history():
+    for i in range(100):
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor() 
+        cur.execute("SELECT Video_ID FROM video_history WHERE Is_in_Main = 0 LIMIT 50;")
+        temp = cur.fetchall()
+        if len(temp) < 2:
+            print("All Videos From Watched History are now in main table tb_videos")
+            break
+        result = []
+        for _ in temp:
+            result.append(_[0])
+        get_videos_stats(result,1)
+        print('Extracting',i+1,' / 10')
+        conn.commit()                                               # Push the data into database
+        conn.close()
+        update_is_in_main()
+        
 def load_history():
     count_loc_prog = 0
     with open("takeout/history/watch-history.html",encoding='utf-8') as fp:
@@ -497,10 +526,6 @@ def load_history():
                     temp = final_time.replace('IST','+0530')
                     epoch = time.mktime(time.strptime(temp, "%b %d, %Y, %I:%M:%S %p %z"))
             cur.execute("INSERT OR IGNORE INTO video_history VALUES (?,?,?,?)", (V_link,final_time,epoch,0))
-               
-            # except:
-
-            #     continue
             
 
         conn.commit()                                               # Push the data into database
@@ -526,8 +551,8 @@ def entire_channel(ch_id):
 if __name__ == "__main__":
     
     # create_new()
-    # temp = input("Enter API KEY \n")
-    # get_api_key(temp)
+    temp = input("Enter API KEY \n")
+    get_api_key(temp)
     # get_channel_details('UCJQJ4GjTiq5lmn8czf8oo0Q')
     # get_playlist_videos('PLZHQObOWTQDP5CVelJJ1bNDouqrAhVPev')
-    early_views(10)
+    update_history()
