@@ -68,6 +68,7 @@ def create_new():
         video_seconds INTEGER,
         Is_Licensed INTEGER,
         Is_Deleted INTEGER,
+        Is_Downloaded INTEGER,
         FOREIGN KEY (Channel_ID)
         REFERENCES tb_channels (Channel_ID),
         FOREIGN KEY (Playlist_ID)
@@ -130,7 +131,7 @@ def get_channel_id(ch_name):
 
 
 
-def get_videos_stats(video_ids,flag,playlistID = None):
+def get_videos_stats(video_ids,flag=1,playlistID = None):
     global youtube
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -228,15 +229,17 @@ def get_videos_stats(video_ids,flag,playlistID = None):
             Is_Licensed = 0 
         Is_Seen = 0                     # 0 = not seen    1 = seen
         Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
+        Is_Downloaded = 0
+        Is_Deleted = 0
         if flag == 1:
             Is_Deleted = 0
         elif flag == 2:
             Is_Deleted = 1
-        params = (Video_id,Video_title,Is_Seen,Worth,Upload_playlistId,Playlist_Id,Published_At,epoch,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Upvote_Ratio,Comment_Count,Duration,video_seconds,Is_Licensed,Is_Deleted)
+        params = (Video_id,Video_title,Is_Seen,Worth,Upload_playlistId,Playlist_Id,Published_At,epoch,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Upvote_Ratio,Comment_Count,Duration,video_seconds,Is_Licensed,Is_Deleted,Is_Downloaded)
         if flag == 1:
-            cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?)", params)
+            cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
         else:
-            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?)", params)
+            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
 
     conn.commit()                                               # Push the data into database
     conn.close()
@@ -357,7 +360,7 @@ def get_playlist_videos(playlistID):
             Video_id = video['snippet']['resourceId']['videoId'];   video_IDS.append(Video_id)
             ch_ID = video['snippet']['channelId']
             params = (Video_id,"",0,0,"","","")
-            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0)", params)    
+            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0,0)", params)    
 
         
     print('Videos in this playlist =',len(video_IDS))
@@ -425,7 +428,7 @@ def most_watched(n=5):
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
     cur.execute("SELECT video_history.Video_ID,COUNT(video_history.Video_ID) AS cnt, Video_title FROM video_history \
-                    LEFT OUTER JOIN tb_videos on tb_videos.Video_id = video_history.Video_ID \
+                    LEFT OUTER JOIN tb_videos on tb_videos.Video_ID = video_history.Video_ID \
                     GROUP BY video_history.Video_ID ORDER BY cnt DESC;")
     results = cur.fetchmany(n)
     print("\t","  Video Link","\t","\t","\t","   Times Watched","\t","\t","      Video Name")
@@ -444,7 +447,7 @@ def early_views(n=5):
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
     cur.execute("SELECT video_history.Video_ID, video_history.epoch -tb_videos.epoch As diff,video_history.epoch,tb_videos.epoch,tb_videos.Video_title,tb_videos.epoch, Watched_at FROM video_history \
-                    LEFT OUTER JOIN tb_videos on tb_videos.Video_id = video_history.Video_ID WHERE diff > 0 GROUP BY video_history.Video_ID ORDER BY diff ASC ;")
+                    LEFT OUTER JOIN tb_videos on tb_videos.Video_id = video_history.Video_ID WHERE (diff-19800) > 0 GROUP BY video_history.Video_ID ORDER BY diff ASC ;")
     results = cur.fetchmany(n)
     print("Video ID","      Diff in Min","\t","Published AT(UTC)"," Watched AT (IST)","\tVideo Title")
     print("-------------------------------------------------------------------------------------------------------")
@@ -479,18 +482,22 @@ def update_history():
     for i in range(1000):
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor() 
+        cur.execute("SELECT Count(*) FROM video_history")
+        tot = cur.fetchone()
         cur.execute("SELECT Video_ID FROM video_history WHERE Is_in_Main = 0 LIMIT 50;")
         temp = cur.fetchall()
         if len(temp) < 2:
             print("All Videos From Watched History are now in main table tb_videos")
             break
         result = []
-        for _ in temp:
-            result.append(_[0])
-        get_videos_stats(result,1)
-        print('Extracting',i+1,' / 10')
-        conn.commit()                                               # Push the data into database
+        for item in temp:
+            cur.execute("UPDATE video_history SET Is_in_Main = 1 WHERE Video_ID = ?",(item[0],))
+            result.append(item[0])
+        
+        conn.commit()                                               
         conn.close()
+        print('Parsing Watch History Videos :',(i*50),' / ',tot[0],end="\r")
+        get_videos_stats(result,1)
         update_is_in_main()
 
 def load_history(res='n'):
@@ -509,7 +516,7 @@ def load_history(res='n'):
         for video in videos:
             count_loc_prog += 1
             if count_loc_prog % 500 == 0:
-                print(count_loc_prog)
+                print('Loading into Database : ',count_loc_prog,' / ',len(videos),end="\r")
             tags = video.find_all('a')
             # try:
 
@@ -530,12 +537,32 @@ def load_history(res='n'):
 
         conn.commit()                                               # Push the data into database
         conn.close()
+    print("\n Loaded \n")
+
+    if res == 'y' or res == "Y":
+        update_history()
     update_is_seen()
     update_is_in_main()
-    if res == 'n' or res == "N":
-        update_history()
 
-
+def download_n(chc='',n=50):
+    with open("download_list.txt",'w',encoding='utf-8') as fp:
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor()
+        if chc == '':
+            cur.execute("SELECT Video_ID FROM tb_videos WHERE Worth = 1 and Is_Downloaded = 0 LIMIT ?",(n,))
+        else:
+            try:
+                cur.execute("SELECT Video_ID FROM tb_videos WHERE Worth = 1 and Is_Downloaded = 0 and Channel_ID = ? LIMIT ?",(chc,n))
+            except:
+                print("Please enter correct Channel ID")
+        down_list = cur.fetchall()
+        for item in down_list:
+            link = "https://www.youtube.com/watch?v="+item[0]
+            cur.execute("UPDATE tb_videos SET Is_Downloaded = 1 WHERE Video_ID = ?",(item[0],))
+            fp.write(link)
+            fp.write('\n')
+        conn.commit()                                               # Push the data into database
+        conn.close()
 
 def entire_channel(ch_id):
     get_channel_details(ch_id)
@@ -553,8 +580,8 @@ def entire_channel(ch_id):
 if __name__ == "__main__":
     
     # create_new()
-    temp = input("Enter API KEY \n")
-    get_api_key(temp)
+    # temp = input("Enter API KEY \n")
+    # get_api_key(temp)
     # get_channel_details('UCJQJ4GjTiq5lmn8czf8oo0Q')
     # get_playlist_videos('PLZHQObOWTQDP5CVelJJ1bNDouqrAhVPev')
-    update_history()
+    download_n()
