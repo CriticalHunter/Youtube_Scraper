@@ -9,7 +9,7 @@ from PyInquirer import style_from_dict, Token, prompt, Validator, ValidationErro
 from termcolor import colored
 import argparse
 
-from src_code import entire_channel, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos, most_watched
+from src_code import entire_channel, get_channel_details, get_api_key, create_new, load_history, get_playlist_videos, most_watched, early_views, download_n
 
 
 
@@ -26,7 +26,7 @@ def log1(string, color, figlet=False):
         six.print_(string)
 
 log1("Youtube_Scraper", color="blue", figlet=True)
-log1("Welcome to Email CLI", "green")
+log1("Welcome to Youtube_Scraper", "green")
 
 style = style_from_dict({
     Token.QuestionMark: '#E91E63 bold',
@@ -67,7 +67,7 @@ questions = [
         'type': 'list',
         'name': 'operation',
         'message': 'What do you want to do?',
-        'choices': ['Find oldest videos on a topic', 'Scrape a Channel','scrape a single playlist' ,'Load Your History','Most Watched Video'],
+        'choices': ['Find oldest videos on a topic', 'Scrape a Channel','Scrape a Single Playlist' ,'Load Your History','Most Watched Video','Early Viewed Video','Generate Download List'],
         'filter': lambda val: val.lower()
     },
     {
@@ -88,6 +88,20 @@ questions = [
         'name': 'playlistID',
         'message': 'Enter the Playlist ID',
         'when': lambda answers: answers['operation'] == 'scrape a single playlist'
+    },
+    {
+        'type': 'list',
+        'name': 'Download',
+        'message': 'What should the list contain?',
+        'choices': ['Videos from a single Channel', 'Videos from entire database'],
+        'when': lambda answers: answers['operation'] == 'generate download list'
+    },
+    {
+        'type': 'confirm',
+        'name': 'import',
+        'message': 'Do you want to import your video_history into main table(tb_videos) too? ',
+        'default': False,
+        'when': lambda answers: answers['operation'] == 'load your history'
     },
 ]
 answers = prompt(questions, style=style)
@@ -110,9 +124,11 @@ elif answers['operation'] == 'scrape a single playlist':
     get_playlist_videos(answers['playlistID'])
 
 elif answers['operation'] == 'load your history':
-    print("Do you want to import your video_history into main table(tb_videos) too?  (Y/N)")
-    res = input()
-    res.lower()
+    if answers['import'] == True:
+        res = 'y'
+    elif answers['import'] == False:
+        res = 'n'
+    print("Please Wait ...")
     load_history(res)
 
 elif answers['operation'] == 'most watched video':
@@ -121,3 +137,21 @@ elif answers['operation'] == 'most watched video':
     n = int(input())
     most_watched(n)
 
+elif answers['operation'] == 'early viewed video':
+    print("If your watch history is not loaded in database, it will give empty result")
+    print("Please enter, How many items to retrieve e.g. 10 for Top 10 \n")
+    n = int(input())
+    early_views(n)
+
+elif answers['Download'] == 'Videos from a single Channel':
+    print("It will list videos that are marked 'Is-Good' and is present in your database")
+    chc = input("Please enter the channel ID \t")
+    print("Please enter, How many items the list will contain \n")
+    n = int(input())
+    download_n(chc,n)
+elif answers['Download'] == 'Videos from entire database':
+    print("It will list videos that are marked 'Is-Good' and is present in your database")
+    chc = ''
+    print("Please enter, How many items the list will contain \n")
+    n = int(input())
+    download_n(chc,n)
