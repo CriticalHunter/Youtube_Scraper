@@ -7,7 +7,7 @@
 
 ### Getting Playlist ID
 
-![example2](/Assets/example2.jpg)
+![example2](/Assets/example20.jpg)
 
 ## Database (in DB Browser) sample results
 ### Database Schema

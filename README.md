@@ -60,6 +60,7 @@ venv pip install -r requirements.txt
 1. Get Your Youtube API key as shown in above video.
 2. Pip install the requirements.txt
 3. Run the program YT_Scrape.py
+![CLI](/Assets/example_0.0.jpg)
 
 The script will ask for required data in the command line and is pretty self-explanatory (Once it runs)
 
