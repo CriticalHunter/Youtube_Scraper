@@ -110,7 +110,10 @@ elif answers['operation'] == 'scrape a single playlist':
     get_playlist_videos(answers['playlistID'])
 
 elif answers['operation'] == 'load your history':
-    load_history()
+    print("Do you want to import your video_history into main table(tb_videos) too?  (Y/N)")
+    res = input()
+    res.lower()
+    load_history(res)
 
 elif answers['operation'] == 'most watched video':
     print("If your watch history is not loaded in database, it will give empty result")

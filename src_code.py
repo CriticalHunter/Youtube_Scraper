@@ -476,7 +476,7 @@ def update_is_in_main():
     conn.close()
 
 def update_history():
-    for i in range(100):
+    for i in range(1000):
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor() 
         cur.execute("SELECT Video_ID FROM video_history WHERE Is_in_Main = 0 LIMIT 50;")
@@ -492,8 +492,8 @@ def update_history():
         conn.commit()                                               # Push the data into database
         conn.close()
         update_is_in_main()
-        
-def load_history():
+
+def load_history(res='n'):
     count_loc_prog = 0
     with open("takeout/history/watch-history.html",encoding='utf-8') as fp:
         conn = sqlite3.connect('youtube.db')              
@@ -532,6 +532,8 @@ def load_history():
         conn.close()
     update_is_seen()
     update_is_in_main()
+    if res == 'n' or res == "N":
+        update_history()
 
 
 
