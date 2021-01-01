@@ -6,7 +6,7 @@ from datetime import datetime
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,\
                                 description='Explore the oldest videos on a Topic',\
-                                 epilog='''Examples \n oldest_videos.py tesla \n oldest_videos.py game of thrones -n 15 -s 2012''')
+                                 epilog='''Examples \n .\oldest_videos.py tesla \n .\oldest_videos.py "game of thrones" -n 15 -s 2012''')
 parser.add_argument("topic", help='Enter the topic')
 group2 = parser.add_argument_group()
 group2.add_argument('-n','--max_results',type=int, metavar='', default=5, help='The script will display "n" results')
