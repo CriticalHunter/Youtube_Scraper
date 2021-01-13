@@ -22,7 +22,8 @@ def create_new():
         Downloaded_Videos INTEGER,
         Folder_Size_GB INTEGER,
         Channel_last_Scraped TEXT,
-        Auto_Update INTEGER
+        Auto_Update INTEGER,
+        Description TEXT
     )
 
         """)
@@ -130,6 +131,7 @@ def migrate():
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Folder_Size_GB INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Channel_last_Scraped TEXT")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Auto_Update INTEGER")
+        cur.execute("ALTER TABLE tb_channels ADD COLUMN Description TEXT")
     except:
         # These stats are added after intitial release of this code.
         pass
