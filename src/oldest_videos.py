@@ -1,8 +1,12 @@
-from src_code import get_api_key
+from get_api_key import api_key
 
 import argparse
 import os
 from datetime import datetime
+
+youtube_instance = api_key()
+youtube_instance.get_api_key()
+youtube = youtube_instance.get_youtube()
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,\
                                 description='Explore the oldest videos on a Topic',\
