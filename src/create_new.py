@@ -92,7 +92,7 @@ def create_new():
         Audio_Type TEXT,
         Frequency INTEGER,
         Channels TEXT,
-        IsInMain INTEGER
+        Is_In_Main INTEGER
     )
 
         """)
