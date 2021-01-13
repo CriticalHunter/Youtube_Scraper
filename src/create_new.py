@@ -17,7 +17,7 @@ def create_new():
         Playlist_Count INTEGER,
         Channel_Duration INTEGER,
         Duration_in_Text TEXT,
-        Is_Removed INTEGER,
+        Is_Deleted INTEGER,
         Deleted_Videos INTEGER,
         Downloaded_Videos INTEGER,
         Folder_Size_GB INTEGER,
