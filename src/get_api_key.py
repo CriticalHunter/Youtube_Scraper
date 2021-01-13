@@ -19,7 +19,7 @@ class api_key():
 
         except HttpError:
             print("\nAPI Key is wrong")
-            print("Please recheck the API key or generate a new key.\n")
+            print("Please recheck the API key or generate a new key.\nThen modify the 'key.txt' file with new Key\n")
 
         except ServerNotFoundError:
             print("\nUnable to connect to internet...")
@@ -31,7 +31,7 @@ class api_key():
         
         except FileNotFoundError:
             print("\nNo such file: 'key.txt'")
-            print("Please create a file named 'key.txt' and place it in .\n")
+            print("Please create a file named 'key.txt' and place your Youtube API key in it.\n")
 
         except Exception as e:
             print(e)
