@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3, time
 
 def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
 
@@ -28,13 +28,15 @@ def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
                 Channel_Id = playlist['snippet']['channelId']
                 Channel_Title = playlist['snippet']['channelTitle']
                 Published_At = playlist['snippet']['publishedAt']
-                Item_Count = playlist['contentDetails']['itemCount']
+                Current_Video_Count = playlist['contentDetails']['itemCount']
                 Playlist_Seconds = 0
                 Playlist_Duration = '0'
                 Is_Seen = 0                     # 0 = not seen    1 = seen
                 Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
-                params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Item_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
-                cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", params)
+                params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Current_Video_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
+                cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 1)", params)
+                last_time = time.time()
+                cur.execute("UPDATE tb_playlists SET Playlist_last_Scraped = ? WHERE Playlist_ID = ? ",(last_time,Playlist_ID))
         if next_page_token is None:
             break
     
