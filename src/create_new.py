@@ -75,12 +75,19 @@ def create_new():
 
         """)
     
-    cur.execute("""CREATE TABLE IF NOT EXISTS tb_downloaded (
-        Channel_ID TEXT PRIMARY KEY,
-        Channel_title TEXT,
-        Watched_at TEXT ,
-        epoch REAL NOT NULL,
-        Playlist_Count INTEGER
+    cur.execute("""CREATE TABLE IF NOT EXISTS yt_downloaded (
+        Video_ID TEXT PRIMARY KEY,
+        Resolution TEXT,
+        Raw_Size INTEGER,
+        Size TEXT,
+        FPS TEXT,
+        bitrate,
+        Audio_Type TEXT,
+        Frequency INTEGER,
+        Channels TEXT,
+        IsInMain INTEGER,
+        FOREIGN KEY (Video_ID)
+        REFERENCES tb_videos (Video_ID)
     )
 
         """)
