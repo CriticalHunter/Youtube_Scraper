@@ -1,10 +1,10 @@
 import sqlite3
 from src.get_channel_playlists import get_channel_playlists
+import sys
 
 def get_channel_details(youtube,channel_id,single=False,playlistID=''):
 
-    conn = sqlite3.connect('youtube.db')              
-    cur = conn.cursor()
+    
     
 
     request = youtube.channels().list(part="snippet,statistics",
@@ -12,9 +12,21 @@ def get_channel_details(youtube,channel_id,single=False,playlistID=''):
                                       ).execute()
 
     #print(request['items'][0]['snippet'])
-
     Channel_Id = channel_id
-    Channel_title = request['items'][0]['snippet']['title']
+    try:
+        Channel_title = request['items'][0]['snippet']['title']
+    except:
+        try:
+            conn = sqlite3.connect('youtube.db')              
+            cur = conn.cursor()
+            cur.execute("SELECT Channel_Id from tb_channels")
+            cur.execute("UPDATE tb_channels SET Is_Removed = ? WHERE Channel_ID = ? ",(1,Channel_Id))
+            conn.commit()                                               # Push the data into database
+            conn.close()
+            sys.exit()
+        except:
+            print("Channel ID not valid")
+            sys.exit()
     Published_At = request['items'][0]['snippet']['publishedAt']
     try:
         Country = request['items'][0]['snippet']['country']
@@ -27,7 +39,9 @@ def get_channel_details(youtube,channel_id,single=False,playlistID=''):
 
     params = (Channel_Id,Channel_title,Published_At,Country,View_Count,Subscriber_Count,Video_Count)
 
-    cur.execute("INSERT OR REPLACE INTO tb_channels VALUES (?, ?, ?, ?, ?, ?, ?, 0)", params)
+    conn = sqlite3.connect('youtube.db')              
+    cur = conn.cursor()
+    cur.execute("INSERT OR REPLACE INTO tb_channels VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 'Scrape Entire Channel',0, 0, 0, 0, 'Never',1)", params)
     
     conn.commit()                                               # Push the data into database
     conn.close()
