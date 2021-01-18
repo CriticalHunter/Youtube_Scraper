@@ -1,5 +1,5 @@
 from src.get_channel_playlists import get_channel_playlists
-from src.get_channel_details import get_channel_details
+from src.get_channel_details import get_channel_details, get_channel_length
 from src.get_playlist_videos import get_playlist_videos
 from src.get_channel_videos import get_channel_videos
 
@@ -14,3 +14,4 @@ def entire_channel(youtube,ch_id):
         print('\nParsing playlist ',count,' \\ ',len(playlists_list))
         get_playlist_videos(youtube,playlist,ec=ec)
     get_channel_videos(youtube,ch_id)
+    get_channel_length(ch_id)

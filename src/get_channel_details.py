@@ -77,5 +77,17 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
     conn.close()
     get_channel_playlists(youtube,Channel_Id,single,playlistID)
 
+def get_channel_length(Channel_Id):
+    conn = sqlite3.connect('youtube.db')              
+    cur = conn.cursor()
+    cur.execute("SELECT SUM(video_seconds) FROM tb_videos WHERE Channel_ID = ? ",(Channel_Id,))
+    tot = cur.fetchone()
+    tot = tot[0]
+    Duration_in_Text = str(datetime.timedelta(seconds = tot))
+    cur.execute("UPDATE tb_channels SET Duration_in_Text = ? WHERE Channel_ID = ? ",(Duration_in_Text,Channel_Id))
+    cur.execute("UPDATE tb_channels SET Channel_Duration = ? WHERE Channel_ID = ? ",(tot,Channel_Id))
+    conn.commit()
+    conn.close()
+
 if __name__ == "__main__":
     pass
