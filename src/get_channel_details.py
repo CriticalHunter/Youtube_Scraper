@@ -19,7 +19,10 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
     except:
         flag1 = False
     try:
-        cur.execute("SELECT Is_Deleted from tb_channels WHERE Channel_ID = ? ",(Channel_Id,))
+        cur.execute("SELECT Channel_ID from tb_channels WHERE Channel_ID = ? ",(Channel_Id,))
+        temp = cur.fetchone()
+        if temp is None:
+            flag2 = False
     except:
         flag2 = False
     cur.execute("SELECT Is_Deleted from tb_channels WHERE Channel_ID = ? ",(Channel_Id,))
@@ -39,6 +42,7 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
     if flag1 == False and flag2 == True and flag3 == 0:
         cur.execute("SELECT Channel_Id from tb_channels")
         cur.execute("UPDATE tb_channels SET Is_Deleted = ? WHERE Channel_ID = ? ",(1,Channel_Id))
+        cur.execute("UPDATE tb_channels SET Auto_Update = ? WHERE Channel_ID = ? ",(0,Channel_Id))
         print("Channel is Deleted and now updated in Database")
         conn.commit()                                               # Push the data into database
         conn.close()
@@ -57,7 +61,7 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
     if ec == False:
         Channel_last_Scraped = 'Never'
     else:
-        Channel_last_Scraped = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        Channel_last_Scraped = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     params = (Channel_Id,Channel_title,Published_At,Country,View_Count,Subscriber_Count,Video_Count)
 
     conn = sqlite3.connect('youtube.db')              
