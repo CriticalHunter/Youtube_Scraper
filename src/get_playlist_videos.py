@@ -4,7 +4,7 @@ from datetime import timedelta
 from src.get_video_stats import get_videos_stats
 from src.get_channel_details import get_channel_details
 
-def get_playlist_videos(youtube,playlistID):
+def get_playlist_videos(youtube,playlistID,ec=False):
 
     ch_ID = 'skip'
     conn = sqlite3.connect('youtube.db')              
@@ -44,7 +44,8 @@ def get_playlist_videos(youtube,playlistID):
     if ch_ID == 'skip':
         return 0
     else:
-        get_channel_details(youtube,ch_ID,True,playlistID)
+        if ec == False:
+            get_channel_details(youtube,ch_ID,True,playlistID)
 
         Playlist_Seconds = get_videos_stats(youtube,video_IDS,1,playlistID)
         Playlist_Duration = str(timedelta(seconds = Playlist_Seconds))

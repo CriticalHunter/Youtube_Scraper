@@ -10,13 +10,13 @@ from PyInquirer import style_from_dict, Token, prompt, Validator, ValidationErro
 from termcolor import colored
 import argparse
 
-from src_code import  load_history, get_playlist_videos, most_watched, early_views, download_n
+from src_code import  load_history, most_watched, early_views, download_n
 
-from src.create_new import create_new
+from src.create_new import dbase
 from src.get_api_key import api_key
 from src.get_channel_details import get_channel_details
 from src.entire_channel import entire_channel
-
+from src.get_playlist_videos import get_playlist_videos
 
 
 def log1(string, color, figlet=False):
@@ -55,7 +55,8 @@ class NumberValidator(Validator):
 print('Please Choose the desired Options')
 print('Press "ctrl+C" to escape at any point\n')
 
-create_new()
+
+dbase()
 
 if not os.path.exists("key.txt"):
     questions = [
@@ -72,6 +73,7 @@ youtube_instance.get_api_key()
 youtube = youtube_instance.get_youtube()
 if youtube == None:
     sys.exit()
+
 try:
     questions = [
         {
@@ -129,7 +131,7 @@ try:
             entire_channel(youtube,answers['channelID'])
 
     elif answers['operation'] == 'scrape a single playlist':
-        get_playlist_videos(answers['playlistID'])
+        get_playlist_videos(youtube,answers['playlistID'])
 
     elif answers['operation'] == 'load your history':
         if answers['import'] == True:
