@@ -104,8 +104,27 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
             Is_Licensed = video['contentDetails']['licensedContent']
         except:            
             Is_Licensed = 0 
-        Is_Seen = 0                     # 0 = not seen    1 = seen
-        Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
+        cur.execute("SELECT Is_Seen FROM tb_videos WHERE Video_ID = ?" ,(Video_id,))
+        temp = cur.fetchone()
+        try:
+            temp = temp[0]
+            if temp == 1:
+                Is_Seen = 1
+            else:
+                Is_Seen = 0 
+        except:
+            Is_Seen = 0
+                                 # 0 = not seen    1 = seen
+        cur.execute("SELECT Worth FROM tb_videos WHERE Video_ID = ?" ,(Video_id,))
+        temp = cur.fetchone()
+        try:
+            temp = temp[0]
+            if temp == 1:
+                Worth = 1
+            else:
+                Worth = 0 
+        except:
+            Worth = 0                      # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
         Is_Downloaded = 0
         Is_Deleted = 0
         if flag == 1:
