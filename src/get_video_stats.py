@@ -140,6 +140,7 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
 
     video_ids = set(video_ids)
     new_ids = set(new_ids)
+    num_new = len(new_ids)
     diff = video_ids-new_ids
     if len(diff) > 0:
         for item in diff:
@@ -147,7 +148,7 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     conn.commit()                                               # Push the data into database
     conn.close()
     if tot_len > 0:
-        return tot_len
+        return tot_len,num_new
 
 if __name__ == "__main__":
     pass

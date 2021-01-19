@@ -41,7 +41,6 @@ def get_playlist_videos(youtube,playlistID,ec=False,ch_id=None):
                 cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0,0)", params)    
 
         
-    print('Videos in this playlist =',len(video_IDS))
     conn.commit()                                               # Push the data into database
     conn.close()
     
@@ -51,10 +50,18 @@ def get_playlist_videos(youtube,playlistID,ec=False,ch_id=None):
         if ec == False:
             get_channel_details(youtube,ch_ID,True,playlistID)
 
-        Playlist_Seconds = get_videos_stats(youtube,video_IDS,1,playlistID)
+        Playlist_Seconds,num_new = get_videos_stats(youtube,video_IDS,1,playlistID)
+        print('Videos in this playlist =',num_new)
         Playlist_Duration = str(timedelta(seconds = Playlist_Seconds))
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor()
+        
+        cur.execute("SELECT Current_Video_Count FROM tb_playlists WHERE playlist_ID = ? ",(playlistID,))
+        num = cur.fetchone()
+        num=num[0]
+        if num != num_new:
+            cur.execute("UPDATE tb_playlists SET Current_Video_Count = ? WHERE playlist_ID = ? ",(num_new,playlistID))
+
         cur.execute("UPDATE tb_playlists SET Playlist_Seconds = ? WHERE playlist_ID = ? ",(Playlist_Seconds,playlistID))
         cur.execute("UPDATE tb_playlists SET Playlist_Duration = ? WHERE playlist_ID = ? ",(Playlist_Duration,playlistID))
         cur.execute("SELECT COUNT(Video_ID) FROM tb_videos WHERE Is_Deleted = ? AND playlist_ID = ? ",(1,playlistID))
