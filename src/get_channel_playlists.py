@@ -31,8 +31,27 @@ def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
                 Current_Video_Count = playlist['contentDetails']['itemCount']
                 Playlist_Seconds = 0
                 Playlist_Duration = '0'
-                Is_Seen = 0                     # 0 = not seen    1 = seen
-                Worth = 0                       # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
+                cur.execute("SELECT Is_Seen FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
+                temp = cur.fetchone()
+                try:
+                    temp = temp[0]
+                    if temp == 1:
+                        Is_Seen = 1
+                    else:
+                        Is_Seen = 0 
+                except:
+                    Is_Seen = 0
+                                        # 0 = not seen    1 = seen
+                cur.execute("SELECT Worth FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
+                temp = cur.fetchone()
+                try:
+                    temp = temp[0]
+                    if temp == 1:
+                        Worth = 1
+                    else:
+                        Worth = 0 
+                except:
+                    Worth = 0                        # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
                 params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Current_Video_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
                 cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 1)", params)
                 last_time = time.time()
