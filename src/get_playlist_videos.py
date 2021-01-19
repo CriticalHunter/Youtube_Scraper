@@ -57,6 +57,10 @@ def get_playlist_videos(youtube,playlistID,ec=False,ch_id=None):
         cur = conn.cursor()
         cur.execute("UPDATE tb_playlists SET Playlist_Seconds = ? WHERE playlist_ID = ? ",(Playlist_Seconds,playlistID))
         cur.execute("UPDATE tb_playlists SET Playlist_Duration = ? WHERE playlist_ID = ? ",(Playlist_Duration,playlistID))
+        cur.execute("SELECT COUNT(Video_ID) FROM tb_videos WHERE Is_Deleted = ? AND playlist_ID = ? ",(1,playlistID))
+        num = cur.fetchone()
+        num=num[0]
+        cur.execute("UPDATE tb_playlists SET Deleted_Videos = ? WHERE playlist_ID = ? ",(num,playlistID))
         conn.commit()                                               # Push the data into database
         conn.close()
 

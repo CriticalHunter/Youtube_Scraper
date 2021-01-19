@@ -15,7 +15,6 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     count1 = 0
     stats = []
     tot_len = 0
-    print(video_ids)
     for i in range(0, len(video_ids), 50):
         res = youtube.videos().list(id=','.join(video_ids[i:i+50]),
                                    part='snippet,statistics,contentDetails').execute()
@@ -27,7 +26,6 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
 
         Video_id = video['id']
         new_ids.append(Video_id)
-        print(Video_id)
         Video_title = video['snippet']['title']
         Upload_playlistId = video['snippet']['channelId']
         

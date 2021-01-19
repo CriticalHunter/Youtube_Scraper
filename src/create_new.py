@@ -159,7 +159,7 @@ def migrate():
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Folder_Size_GB INTEGER")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Playlist_last_Scraped TEXT")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Auto_Update INTEGER")
-        cur.execute("ALTER TABLE tb_playlists RENAME COLUMN Item_Count TO Current_Video_Count")
+        cur.execute("ALTER TABLE tb_playlists RENAME COLUMN Item_Count TO Video_Count")
     except:
         # These stats are added after intitial release of this code.
         pass
