@@ -15,17 +15,19 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     count1 = 0
     stats = []
     tot_len = 0
-
+    print(video_ids)
     for i in range(0, len(video_ids), 50):
         res = youtube.videos().list(id=','.join(video_ids[i:i+50]),
                                    part='snippet,statistics,contentDetails').execute()
         stats += res['items']
     
-
+    new_ids = []
     for video in stats:
         count1 += 1
 
         Video_id = video['id']
+        new_ids.append(Video_id)
+        print(Video_id)
         Video_title = video['snippet']['title']
         Upload_playlistId = video['snippet']['channelId']
         
@@ -131,12 +133,19 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
             Is_Deleted = 0
         elif flag == 2:
             Is_Deleted = 1
+            cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(Video_id,))
         params = (Video_id,Video_title,Is_Seen,Worth,Upload_playlistId,Playlist_Id,Published_At,epoch,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Upvote_Ratio,Comment_Count,Duration,video_seconds,Is_Licensed,Is_Deleted,Is_Downloaded)
         if flag == 1:
             cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
         else:
             cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
 
+    video_ids = set(video_ids)
+    new_ids = set(new_ids)
+    diff = video_ids-new_ids
+    if len(diff) > 0:
+        for item in diff:
+            cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
     conn.commit()                                               # Push the data into database
     conn.close()
     if tot_len > 0:
