@@ -125,7 +125,7 @@ def migrate():
     try:
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Channel_Duration INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Duration_in_Text TEXT")
-        cur.execute("ALTER TABLE tb_channels ADD COLUMN Is_Removed INTEGER")
+        cur.execute("ALTER TABLE tb_channels ADD COLUMN Is_Deleted INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Deleted_Videos INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Downloaded_Videos INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Folder_Size_GB INTEGER")
