@@ -4,7 +4,7 @@ from datetime import timedelta
 from src.get_video_stats import get_videos_stats
 from src.get_channel_details import get_channel_details
 
-def get_playlist_videos(youtube,playlistID,ec=False):
+def get_playlist_videos(youtube,playlistID,ec=False,ch_id=None):
 
     ch_ID = 'skip'
     conn = sqlite3.connect('youtube.db')              
@@ -33,8 +33,12 @@ def get_playlist_videos(youtube,playlistID,ec=False):
                 ch_ID = video['snippet']['channelId']
             except:
                 ch_ID = 'skip'
-            params = (Video_id,"",0,0,"","","")
-            cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0,0)", params)    
+            if ec == True:
+                params = (Video_id,"",0,0,ch_id,None,None,0,ch_id,'',0,0,0,0,0,'',0,0,1,0)
+                cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, ?,?, ?,?,?,?,?,?,?,?,?,?,?)", params)
+            else:
+                params = (Video_id,"",0,0,"","","")
+                cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?,? ,?, ?, ?, 0,'', '',0,0,0,0,0,'',0,0,0,0)", params)    
 
         
     print('Videos in this playlist =',len(video_IDS))

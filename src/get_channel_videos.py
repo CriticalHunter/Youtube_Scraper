@@ -29,17 +29,20 @@ def get_channel_videos(youtube,channel_id):
         if next_page_token is None:
             break
 
-    for newVid in video_ids:
-        cur.execute("SELECT Video_id FROM tb_videos WHERE Video_id=?",(newVid,))
-        if cur.fetchone():
-            pass
-        else:
-            new_video_ids.append(newVid)
+    CVids = []
+    cur.execute("SELECT Video_ID FROM tb_videos WHERE Channel_ID=? AND Playlist_ID IS NOT NULL",(channel_id,))
+    temp = cur.fetchall()
+    for item in temp:
+        CVids.append(item[0])
+    CVids = set(CVids)
+    video_ids = set(video_ids)
+    diff = video_ids - CVids
+    new_video_ids = list(diff)
     conn.commit()                                               # Push the data into database
     conn.close()
 
     print('\nParsing ',len(new_video_ids),' videos, which are not in any playlist')
-    get_videos_stats(youtube,video_ids,flag=0)
+    get_videos_stats(youtube,new_video_ids,flag=0)
 
 if __name__ == "__main__":
     pass    
