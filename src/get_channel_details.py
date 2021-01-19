@@ -86,6 +86,10 @@ def get_channel_length(Channel_Id):
     Duration_in_Text = str(datetime.timedelta(seconds = tot))
     cur.execute("UPDATE tb_channels SET Duration_in_Text = ? WHERE Channel_ID = ? ",(Duration_in_Text,Channel_Id))
     cur.execute("UPDATE tb_channels SET Channel_Duration = ? WHERE Channel_ID = ? ",(tot,Channel_Id))
+    cur.execute("SELECT COUNT(Video_ID) FROM tb_videos WHERE Is_Deleted = ? AND Channel_ID = ? ",(1,Channel_Id))
+    num = cur.fetchone()
+    num=num[0]
+    cur.execute("UPDATE tb_channels SET Deleted_Videos = ? WHERE Channel_ID = ? ",(num,Channel_Id))
     conn.commit()
     conn.close()
 
