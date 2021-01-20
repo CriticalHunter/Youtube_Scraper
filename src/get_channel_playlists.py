@@ -51,9 +51,32 @@ def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
                     else:
                         Worth = 0 
                 except:
-                    Worth = 0                        # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
-                params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Current_Video_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth)
-                cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 0, 0, 0, 1)", params)
+                    Worth = 0                        
+                
+                cur.execute("SELECT Downloaded_Videos FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
+                temp = cur.fetchone()
+                print(temp)
+                try:
+                    temp = int(temp[0])
+                    if temp > 0:
+                        Downloaded_Videos = temp
+                    else:
+                        Downloaded_Videos = 0 
+                except:
+                    Downloaded_Videos = 0  
+                cur.execute("SELECT Folder_Size_GB FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
+                temp = cur.fetchone()
+                print(temp)
+                try:
+                    temp = int(temp[0])
+                    if temp > 0:
+                        Folder_Size_GB = temp
+                    else:
+                        Folder_Size_GB = 0 
+                except:
+                    Folder_Size_GB = 0  
+                params = (Playlist_ID,Playlist_title,Channel_Id,Channel_Title,Published_At,Current_Video_Count,Playlist_Seconds,Playlist_Duration,Is_Seen,Worth,0,0,Downloaded_Videos,Folder_Size_GB)
+                cur.execute("INSERT OR REPLACE INTO tb_playlists VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?, 0, 1)", params)
                 last_time = time.time()
                 cur.execute("UPDATE tb_playlists SET Playlist_last_Scraped = ? WHERE Playlist_ID = ? ",(last_time,Playlist_ID))
         if next_page_token is None:
