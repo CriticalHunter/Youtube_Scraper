@@ -10,13 +10,16 @@ from PyInquirer import style_from_dict, Token, prompt, Validator, ValidationErro
 from termcolor import colored
 import argparse
 
-from src_code import  load_history, most_watched, early_views, download_n
 
 from src.create_new import dbase
 from src.get_api_key import api_key
 from src.get_channel_details import get_channel_details
 from src.entire_channel import entire_channel
 from src.get_playlist_videos import get_playlist_videos
+from src.load_history import load_history
+from src.most_watched import most_watched
+from src.early_views import early_views
+from src.download_these import download_n
 
 
 def log1(string, color, figlet=False):
