@@ -45,6 +45,16 @@ def get_playlist_videos(youtube,playlistID,ec=False,ch_id=None):
     conn.close()
     
     if ch_ID == 'skip':
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor()
+        cur.execute("SELECT Current_Video_Count FROM tb_playlists WHERE playlist_ID = ? ",(playlistID,))
+        num = cur.fetchone()
+        num=num[0]
+        print(num)
+        if num == 0:
+            cur.execute("UPDATE tb_playlists SET Is_Removed = ? WHERE playlist_ID = ? ",(1,playlistID))
+        conn.commit()                                               # Push the data into database
+        conn.close()
         return 0
     else:
         if ec == False:

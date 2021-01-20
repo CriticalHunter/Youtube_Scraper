@@ -55,7 +55,6 @@ def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
                 
                 cur.execute("SELECT Downloaded_Videos FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
                 temp = cur.fetchone()
-                print(temp)
                 try:
                     temp = int(temp[0])
                     if temp > 0:
@@ -66,7 +65,6 @@ def get_channel_playlists(youtube,channel_id,single=False,playlistID=''):
                     Downloaded_Videos = 0  
                 cur.execute("SELECT Folder_Size_GB FROM tb_playlists WHERE Playlist_ID = ?" ,(Playlist_ID,))
                 temp = cur.fetchone()
-                print(temp)
                 try:
                     temp = int(temp[0])
                     if temp > 0:
