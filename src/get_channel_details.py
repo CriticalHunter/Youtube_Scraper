@@ -62,11 +62,33 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
         Channel_last_Scraped = 'Never'
     else:
         Channel_last_Scraped = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    params = (Channel_Id,Channel_title,Published_At,Country,View_Count,Subscriber_Count,Video_Count)
+
+    cur.execute("SELECT Downloaded_Videos FROM tb_channels WHERE Channel_ID = ?" ,(Channel_Id,))
+    temp = cur.fetchone()
+    try:
+        temp = temp[0]
+        if temp > 0:
+            Downloaded_Videos = temp
+        else:
+            Downloaded_Videos = 0 
+    except:
+        Downloaded_Videos = 0
+    cur.execute("SELECT Folder_Size_GB FROM tb_channels WHERE Channel_ID = ?" ,(Channel_Id,))
+    temp = cur.fetchone()
+    try:
+        temp = temp[0]
+        if temp > 0:
+            Folder_Size_GB = temp
+        else:
+            Folder_Size_GB = 0 
+    except:
+        Folder_Size_GB = 0
+    
+    params = (Channel_Id,Channel_title,Published_At,Country,View_Count,Subscriber_Count,Video_Count,0,0,'First, Scrape Entire Channel',0,0,Downloaded_Videos,Folder_Size_GB)
 
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
-    cur.execute("INSERT OR REPLACE INTO tb_channels VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0, 'First, Scrape Entire Channel',0, 0, 0, 0, 'Never',1,'')", params)
+    cur.execute("INSERT OR REPLACE INTO tb_channels VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?, ?,?, 'Never',1,'')", params)
     conn.commit()                                               # Push the data into database
     conn.close()
     conn = sqlite3.connect('youtube.db')              
