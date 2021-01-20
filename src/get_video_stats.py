@@ -124,8 +124,18 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
             else:
                 Worth = 0 
         except:
-            Worth = 0                      # 0 = not rated , ratings = 1(not worth saving)/2(worth saving)
-        Is_Downloaded = 0
+            Worth = 0      
+
+        cur.execute("SELECT Is_Downloaded FROM tb_videos WHERE Video_ID = ?" ,(Video_id,))
+        temp = cur.fetchone()
+        try:
+            temp = temp[0]
+            if temp == 1:
+                Is_Downloaded = 1
+            else:
+                Is_Downloaded = 0 
+        except:
+            Is_Downloaded = 0 
         Is_Deleted = 0
         if flag == 1:
             Is_Deleted = 0
