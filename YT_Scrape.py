@@ -128,10 +128,12 @@ try:
         os.system("python .\src\oldest_videos.py -h")
 
     elif answers['operation'] == 'scrape a channel':
+        Ch_ID = answers['channelID']
+        new_Ch_ID = Ch_ID[0]+'C'+Ch_ID[2:]
         if answers['Channel'] == 'Just Channel Stats (Individual video stats are not scraped)':
-            get_channel_details(youtube,answers['channelID'])
+            get_channel_details(youtube,new_Ch_ID)
         elif answers['Channel'] == 'Scrape Everything for a channel':
-            entire_channel(youtube,answers['channelID'])
+            entire_channel(youtube,new_Ch_ID)
 
     elif answers['operation'] == 'scrape a single playlist':
         get_playlist_videos(youtube,answers['playlistID'])
