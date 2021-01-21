@@ -13,6 +13,9 @@ def entire_channel(youtube,ch_id):
     for playlist in playlists_list:
         count += 1
         print('\nParsing playlist ',count,' \\ ',len(playlists_list))
-        get_playlist_videos(youtube,playlist,ec=ec,ch_id=ch_id)
+        try:
+            get_playlist_videos(youtube,playlist,ec=ec,ch_id=ch_id)
+        except:
+            print("Error getting Playlist :",playlist)
     get_channel_videos(youtube,ch_id)
     get_channel_length(ch_id)

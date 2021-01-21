@@ -42,7 +42,7 @@ def get_channel_videos(youtube,channel_id):
     conn.close()
 
     print('\nParsing ',len(new_video_ids),' videos, which are not in any playlist')
-    get_videos_stats(youtube,new_video_ids,flag=0)
+    get_videos_stats(youtube,new_video_ids,flag=1)
 
 if __name__ == "__main__":
     pass    

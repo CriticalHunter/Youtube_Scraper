@@ -4,6 +4,7 @@ from os import path
 import sys
 
 def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
+    oflag = flag
     if not path.exists('youtube.db'):
         print("Please Create the database First")
         sys.exit()
@@ -23,8 +24,11 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     new_ids = []
     for video in stats:
         count1 += 1
-
-        Video_id = video['id']
+        try:
+            Video_id = video['id']
+        except:
+            Video_id = ''
+            flag = 3
         new_ids.append(Video_id)
         Video_title = video['snippet']['title']
         Upload_playlistId = video['snippet']['channelId']
@@ -51,8 +55,15 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
         try:
             View_Count = video['statistics']['viewCount']
         except:
-            View_Count = 0
-            flag = 2
+            View_Count = 1111
+        cur.execute("SELECT View_Count FROM tb_videos WHERE Video_ID = ?" ,(Video_id,))
+        temp = cur.fetchone()
+        try:
+            temp = temp[0]
+            if View_Count < temp:
+                continue
+        except:
+            pass
         try:
             Like_Count = video['statistics']['likeCount']
         except:
@@ -98,7 +109,6 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
         except:            
             Duration = '0'
             video_seconds = 0
-            flag = 2
             
         try:
             Is_Licensed = video['contentDetails']['licensedContent']
@@ -137,15 +147,17 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
         except:
             Is_Downloaded = 0 
         Is_Deleted = 0
-        if flag == 1:
+        if flag == 1 or flag == 2:
             Is_Deleted = 0
-        elif flag == 2:
+        elif flag == 3:
             Is_Deleted = 1
+            print(Video_id,' is deleted')
             cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(Video_id,))
+            flag = oflag
         params = (Video_id,Video_title,Is_Seen,Worth,Upload_playlistId,Playlist_Id,Published_At,epoch,Channel_Id,Channel_Title,View_Count,Like_Count,Dislike_Count,Upvote_Ratio,Comment_Count,Duration,video_seconds,Is_Licensed,Is_Deleted,Is_Downloaded)
         if flag == 1:
             cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
-        else:
+        elif flag == 2:
             cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
 
     video_ids = set(video_ids)
@@ -153,6 +165,10 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     num_new = len(new_ids)
     diff = video_ids-new_ids
     if len(diff) > 0:
+        print(video_ids,'\n')
+        print(new_ids,'\n')
+        print(diff)
+        # input()f
         for item in diff:
             cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
     conn.commit()                                               # Push the data into database
