@@ -5,6 +5,18 @@ from bs4 import BeautifulSoup
 from src.get_video_stats import get_videos_stats
 from src.get_api_key import api_key
 
+
+def update_title():
+    conn = sqlite3.connect('youtube.db')              
+    cur = conn.cursor()
+    cur.execute("SELECT Video_ID FROM video_history WHERE (Title IS NULL OR Title = '') AND Is_Deleted = 0")
+    temp = cur.fetchall()
+    for item in temp:
+        cur.execute("SELECT Video_title FROM tb_videos WHERE Video_ID = ?",(item[0],))
+        tit = cur.fetchone()
+        cur.execute("UPDATE video_history SET Title = ? WHERE Video_ID = ?",(tit[0],item[0]))
+    conn.commit()
+    conn.close()
 def update_is_seen():
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -18,6 +30,8 @@ def update_is_in_main():
     cur = conn.cursor()
     cur.execute("UPDATE video_history SET Is_in_Main = 1 WHERE Video_ID IN (SELECT Video_ID FROM video_history \
                 WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
+    cur.execute("UPDATE video_history SET Is_Deleted = 1 WHERE Video_ID NOT IN (SELECT Video_ID FROM video_history WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
+
     conn.commit()                                               
     conn.close()
 
@@ -27,7 +41,7 @@ def update_history(youtube):
         cur = conn.cursor() 
         cur.execute("SELECT Count(*) FROM video_history")
         tot = cur.fetchone()
-        cur.execute("SELECT Video_ID FROM video_history WHERE Is_in_Main = 0 LIMIT 50;")
+        cur.execute("SELECT Video_ID FROM video_history WHERE Is_in_Main = 0 AND Is_Deleted = 0 LIMIT 50;")
         temp = cur.fetchall()
         if len(temp) < 2:
             print("All Videos From Watched History are now in main table tb_videos")
@@ -75,7 +89,7 @@ def load_history(res='n'):
                     final_time = (watched_at)
                     temp = final_time.replace('IST','+0530')
                     epoch = time.mktime(time.strptime(temp, "%b %d, %Y, %I:%M:%S %p %z"))
-            cur.execute("INSERT OR IGNORE INTO video_history VALUES (?,?,?,?)", (V_link,final_time,epoch,0))
+            cur.execute("INSERT OR IGNORE INTO video_history VALUES (?,?,?,?,?,?)", (V_link,'',final_time,epoch,0,0))
             
 
         conn.commit()                                               # Push the data into database
@@ -87,6 +101,7 @@ def load_history(res='n'):
         youtube_instance.get_api_key()
         youtube = youtube_instance.get_youtube()
         update_history(youtube)
+        update_title()
     update_is_seen()
     update_is_in_main()
 

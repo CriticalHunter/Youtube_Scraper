@@ -75,9 +75,11 @@ def create_new():
 
     cur.execute("""CREATE TABLE IF NOT EXISTS video_history (
         Video_ID TEXT NOT NULL,
+        Title TEXT,
         Watched_at TEXT ,
         epoch REAL NOT NULL,
         Is_in_Main INTEGER,
+        Is_Deleted INTEGER,
         PRIMARY KEY ( Video_ID, epoch)
     )
 
