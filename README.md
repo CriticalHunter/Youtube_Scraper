@@ -71,7 +71,7 @@ Install this library in a [virtualenv](https://virtualenv.pypa.io/en/latest/) us
 pip install virtualenv
 virtualenv venv
 venv/bin/activate
-venv pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 #### Windows
@@ -80,7 +80,7 @@ venv pip install -r requirements.txt
 pip install virtualenv
 virtualenv venv
 venv\Scripts\activate
-venv pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 
