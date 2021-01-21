@@ -96,7 +96,7 @@ try:
         {
             'type': 'input',
             'name': 'channelID',
-            'message': 'Enter the Channel ID',
+            'message': 'Enter the Channel ID (leave it blank to pick channels from Channels.txt)',
             'when': lambda answers: answers['operation'] == 'scrape a channel' and answers['Channel'] != ''
         },
         {
@@ -128,12 +128,24 @@ try:
         os.system("python .\src\oldest_videos.py -h")
 
     elif answers['operation'] == 'scrape a channel':
-        Ch_ID = answers['channelID']
-        new_Ch_ID = Ch_ID[0]+'C'+Ch_ID[2:]
-        if answers['Channel'] == 'Just Channel Stats (Individual video stats are not scraped)':
-            get_channel_details(youtube,new_Ch_ID)
-        elif answers['Channel'] == 'Scrape Everything for a channel':
-            entire_channel(youtube,new_Ch_ID)
+        if answers['channelID'] == '':
+            with open("Channels.txt") as f:
+                for line in f:
+                    new_Ch_ID = line[0]+'C'+line[2:]
+                    new_Ch_ID = new_Ch_ID.strip()
+                    print(new_Ch_ID)
+                    if answers['Channel'] == 'Just Channel Stats (Individual video stats are not scraped)':
+                        get_channel_details(youtube,new_Ch_ID)
+                    elif answers['Channel'] == 'Scrape Everything for a channel':
+                        entire_channel(youtube,new_Ch_ID)
+            
+        else:
+            Ch_ID = answers['channelID']
+            new_Ch_ID = Ch_ID[0]+'C'+Ch_ID[2:]
+            if answers['Channel'] == 'Just Channel Stats (Individual video stats are not scraped)':
+                get_channel_details(youtube,new_Ch_ID)
+            elif answers['Channel'] == 'Scrape Everything for a channel':
+                entire_channel(youtube,new_Ch_ID)
 
     elif answers['operation'] == 'scrape a single playlist':
         get_playlist_videos(youtube,answers['playlistID'])

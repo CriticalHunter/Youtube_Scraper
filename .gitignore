@@ -9,3 +9,4 @@ __pycache__
 download_list.txt
 Later.txt
 key.txt
+*.exe
