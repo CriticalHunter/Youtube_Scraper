@@ -1,8 +1,6 @@
 from __future__ import print_function, unicode_literals
-import re
-import six
-import os
-import sys
+import re, six, os, sys, json
+
 
 from pyfiglet import Figlet, figlet_format
 from pprint import pprint
