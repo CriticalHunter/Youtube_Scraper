@@ -165,9 +165,9 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
     num_new = len(new_ids)
     diff = video_ids-new_ids
     if len(diff) > 0:
-        print(video_ids,'\n')
-        print(new_ids,'\n')
-        print(diff)
+        # print(video_ids,'\n')
+        # print(new_ids,'\n')
+        # print(diff)
         # input()f
         for item in diff:
             cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
