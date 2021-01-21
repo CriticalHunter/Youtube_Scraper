@@ -159,20 +159,26 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
             cur.execute("INSERT OR REPLACE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
         elif flag == 2:
             cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
+    conn.commit()                                               
+    conn.close()
 
     video_ids = set(video_ids)
     new_ids = set(new_ids)
     num_new = len(new_ids)
     diff = video_ids-new_ids
     if len(diff) > 0:
-        # print(video_ids,'\n')
-        # print(new_ids,'\n')
-        # print(diff)
-        # input()f
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor()
         for item in diff:
-            cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
-    conn.commit()                                               # Push the data into database
-    conn.close()
+            print(item,' not available')
+            try:
+                params = (item,'Not Available',0,0,'','','','',Channel_Id,Channel_Title,'','','','','','','','',1,0)
+                cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
+                cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
+            except:
+                pass
+        conn.commit()                                               
+        conn.close()
     if tot_len > 0:
         return tot_len,num_new
 

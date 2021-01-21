@@ -17,6 +17,12 @@ def update_title():
         cur.execute("UPDATE video_history SET Title = ? WHERE Video_ID = ?",(tit[0],item[0]))
     conn.commit()
     conn.close()
+def update_deleted():
+    conn = sqlite3.connect('youtube.db')              
+    cur = conn.cursor()
+    cur.execute("UPDATE video_history SET Is_Deleted = 1 WHERE Video_ID NOT IN (SELECT Video_ID FROM video_history WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
+    conn.commit()                                               
+    conn.close()
 def update_is_seen():
     conn = sqlite3.connect('youtube.db')              
     cur = conn.cursor()
@@ -30,8 +36,7 @@ def update_is_in_main():
     cur = conn.cursor()
     cur.execute("UPDATE video_history SET Is_in_Main = 1 WHERE Video_ID IN (SELECT Video_ID FROM video_history \
                 WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
-    cur.execute("UPDATE video_history SET Is_Deleted = 1 WHERE Video_ID NOT IN (SELECT Video_ID FROM video_history WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
-
+    
     conn.commit()                                               
     conn.close()
 
@@ -102,6 +107,7 @@ def load_history(res='n'):
         youtube = youtube_instance.get_youtube()
         update_history(youtube)
         update_title()
+        update_deleted()
     update_is_seen()
     update_is_in_main()
 
