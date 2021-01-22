@@ -11,17 +11,25 @@ from get_video_stats import get_videos_stats
 def update_local(vid_path):
     vid_path1 = '"'+vid_path+'"'
     command = "./ffmpeg -i "+vid_path1+" -hide_banner"
-    with open('log1.txt', "w") as outfile:
-        subprocess.run(command, stderr=subprocess.STDOUT,stdout=outfile)
-    with open('log1.txt', "r") as fhand:
+    print(command)
+    try:
+        with open('log1.txt', "w",encoding='utf-8') as outfile:
+            subprocess.run(command, stderr=subprocess.STDOUT,stdout=outfile)
+    except Exception as e:
+        print(e)
+    with open('log1.txt', "r",encoding='utf-8') as fhand:
         for line in fhand:
             line=line.lstrip()
-            if line.startswith('Stream #0:0'):
+            temp_match = line[0:11]
+            if temp_match == 'Stream #0:0':
                 result = re.findall('\d+x\d+', line)
                 Resolution = result[0]
-                result = re.findall('\d+.\d+ fps', line)
-                fps = result[0]
-                fps = fps.strip(' fps')
+                result = re.findall('[0-9.]+ fps', line)
+                try:
+                    fps = result[0]
+                    fps = fps.strip(' fps')
+                except:
+                    fps = 0
             if line.startswith('Duration:'):
                 result = re.findall('\d+ ', line)
                 bitrate = result[0]
@@ -42,8 +50,8 @@ def update_local(vid_path):
         return (Resolution,raw_size,size,fps,bitrate,Audio_Type,Frequency,Channels)
 
 def import_vids():
-    mypath = ('D:\\Youtube')
-    conn = sqlite3.connect('youtube.db')
+    mypath = ('D:\\Youtube1')
+    conn = sqlite3.connect('C:\\Users\\Sambit\\Desktop\\Projects\\Youtube\\Youtube_Scraper\\youtube.db')
     cur = conn.cursor()
     # r=root, d=directories, f = files
     for r, d, f in os.walk(mypath):
@@ -63,7 +71,7 @@ def import_vids():
 
 def update_vids():
     def is_in_main():
-        conn = sqlite3.connect('youtube.db')              
+        conn = sqlite3.connect('C:\\Users\\Sambit\\Desktop\\Projects\\Youtube\\Youtube_Scraper\\youtube.db')              
         cur = conn.cursor()
         cur.execute("UPDATE yt_downloaded SET Is_In_Main = 1 WHERE Video_ID IN (SELECT Video_ID FROM yt_downloaded \
                     WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
@@ -71,7 +79,7 @@ def update_vids():
         conn.close()
     is_in_main()
     for i in range(2000):
-        conn = sqlite3.connect('youtube.db')              
+        conn = sqlite3.connect('C:\\Users\\Sambit\\Desktop\\Projects\\Youtube\\Youtube_Scraper\\youtube.db')              
         cur = conn.cursor() 
         cur.execute("SELECT Count(*) FROM yt_downloaded")
         tot = cur.fetchone()
@@ -84,6 +92,7 @@ def update_vids():
         for item in temp:
             cur.execute("UPDATE yt_downloaded SET Is_In_Main = 1 WHERE Video_ID = ?",(item[0],))
             result.append(item[0])
+            print(result)
         
         conn.commit()                                               
         conn.close()
@@ -96,7 +105,10 @@ def update_vids():
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor()
         for item in result:
-            cur.execute("UPDATE tb_videos SET IS_Downloaded = 1 WHERE Video_ID = ?",(item,))
+            print(item)
+            cur.execute("UPDATE tb_videos SET Is_Downloaded = 1 WHERE Video_ID = ?",(item,))
+            cur.execute("UPDATE tb_videos SET Is_Seen = 1 WHERE Video_ID = ?",(item,))
+            cur.execute("UPDATE tb_videos SET Worth = 1 WHERE Video_ID = ?",(item,))
         conn.commit()                                               
         conn.close()
         is_in_main()
