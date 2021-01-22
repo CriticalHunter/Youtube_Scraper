@@ -1,4 +1,4 @@
-
+from get_api_key import api_key
 def get_channel_id(youtube,ch_name):
     request = youtube.channels().list(
             part="snippet,contentDetails,statistics",
@@ -27,4 +27,7 @@ def get_channel_id(youtube,ch_name):
         print(" ")
 
 if __name__ == "__main__":
-    pass
+    youtube_instance = api_key()
+    youtube_instance.get_api_key()
+    youtube = youtube_instance.get_youtube()
+    get_channel_id(youtube,'JDCav24')
