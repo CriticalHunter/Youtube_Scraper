@@ -1,7 +1,7 @@
 import sqlite3
 
 def download_n(chc='',n=50):
-    with open("download_list.txt",'w',encoding='utf-8') as fp:
+    with open("download.txt",'w',encoding='utf-8') as fp:
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor()
         if chc == '':
