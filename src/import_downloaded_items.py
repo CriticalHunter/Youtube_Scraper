@@ -11,7 +11,6 @@ from get_video_stats import get_videos_stats
 def update_local(vid_path):
     vid_path1 = '"'+vid_path+'"'
     command = "./ffmpeg -i "+vid_path1+" -hide_banner"
-    print(command)
     try:
         with open('log1.txt', "w",encoding='utf-8') as outfile:
             subprocess.run(command, stderr=subprocess.STDOUT,stdout=outfile)
@@ -92,7 +91,6 @@ def update_vids():
         for item in temp:
             cur.execute("UPDATE yt_downloaded SET Is_In_Main = 1 WHERE Video_ID = ?",(item[0],))
             result.append(item[0])
-            print(result)
         
         conn.commit()                                               
         conn.close()
