@@ -6,7 +6,6 @@ test.py
 test2.py
 takeout
 __pycache__
-download_list.txt
-Later.txt
-key.txt
+*.txt
 *.exe
+*.log
