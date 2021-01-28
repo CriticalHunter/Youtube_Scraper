@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess, os,re
-
+#SELECT * FROM tb_videos WHERE Video_ID IN (SELECT Video_ID FROM yt_downloaded) ORDER BY Is_Seen
+# Sanity Check
 from os import listdir
 from os.path import isfile, join
 import sqlite3
@@ -96,6 +97,7 @@ def update_vids():
         conn.close()
 
         print('Parsing Downloaded Videos :',(i*50),' / ',tot[0],end="\r")
+        print(' ')
         youtube_instance = api_key()
         youtube_instance.get_api_key()
         youtube = youtube_instance.get_youtube()
@@ -103,7 +105,7 @@ def update_vids():
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor()
         for item in result:
-            print(item)
+            print('New Item added successfully :',item)
             cur.execute("UPDATE tb_videos SET Is_Downloaded = 1 WHERE Video_ID = ?",(item,))
             cur.execute("UPDATE tb_videos SET Is_Seen = 1 WHERE Video_ID = ?",(item,))
             cur.execute("UPDATE tb_videos SET Worth = 1 WHERE Video_ID = ?",(item,))
