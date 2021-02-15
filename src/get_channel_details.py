@@ -8,7 +8,7 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
                                       id=channel_id
                                       ).execute()
 
-    #print(request['items'][0]['snippet'])
+    # print(request['items'][0])
     Channel_Id = channel_id
     flag1 = True
     flag2 = True
@@ -55,8 +55,10 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
     except:
         Country = None
     View_Count = request['items'][0]['statistics']['viewCount']
-
-    Subscriber_Count = request['items'][0]['statistics']['subscriberCount']
+    try:
+        Subscriber_Count = request['items'][0]['statistics']['subscriberCount']
+    except:
+        Subscriber_Count = None
     Video_Count = request['items'][0]['statistics']['videoCount']
     if ec == False:
         Channel_last_Scraped = 'Never'
@@ -105,6 +107,8 @@ def get_channel_length(Channel_Id):
     cur.execute("SELECT SUM(video_seconds) FROM tb_videos WHERE Channel_ID = ? ",(Channel_Id,))
     tot = cur.fetchone()
     tot = tot[0]
+    if tot is None:
+        tot = 0                                                 # For channels with 0 Original Videos (e.g. Hasan Minaj)
     Duration_in_Text = str(datetime.timedelta(seconds = tot))
     cur.execute("UPDATE tb_channels SET Duration_in_Text = ? WHERE Channel_ID = ? ",(Duration_in_Text,Channel_Id))
     cur.execute("UPDATE tb_channels SET Channel_Duration = ? WHERE Channel_ID = ? ",(tot,Channel_Id))
