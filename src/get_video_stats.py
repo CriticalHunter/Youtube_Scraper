@@ -73,7 +73,7 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
         except:
             Dislike_Count = 0
         try:
-            Upvote_Ratio = (int(Like_Count)/(int(Like_Count)+(int(Dislike_Count))))*100
+            Upvote_Ratio = round(((int(Like_Count)/(int(Like_Count)+(int(Dislike_Count))))*100),3)
         except:
             Upvote_Ratio = 0
         try:
@@ -172,7 +172,7 @@ def get_videos_stats(youtube,video_ids,flag=1,playlistID = None):
         for item in diff:
             print(item,' not available')
             try:
-                params = (item,'Not Available',0,0,'','','','',Channel_Id,Channel_Title,'','','','','','','','',1,0)
+                params = (item,'Not Available',0,0,Channel_Id,playlistID,'','',Channel_Id,Channel_Title,'','','','','','','','',1,0)
                 cur.execute("INSERT OR IGNORE INTO tb_videos VALUES (?, ?, ?, ?, ?, ?, ? ,? ,? ,? ,? ,? , ?, ?, ?, ?, ?, ?, ?, ?)", params)
                 cur.execute("UPDATE tb_videos SET IS_Deleted = 1 WHERE Video_ID = ?",(item,))
             except:
