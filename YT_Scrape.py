@@ -202,8 +202,8 @@ try:
                 download_files(720)
             elif answers['Quality'] == '360p':
                 download_files(360)
-            replace2()
-            convertWebp2jpgInDirectory()
+            replace2('D:\Youtube')
+            convertWebp2jpgInDirectory('D:\Youtube')
         else:
             if answers['Quality'] == '4k/Best Available':
                 download_files('4k')
