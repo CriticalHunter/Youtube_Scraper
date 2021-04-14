@@ -19,6 +19,7 @@ from src.most_watched import most_watched
 from src.early_views import early_views
 from src.download_these import download_n
 
+from src.downloading import *
 
 def log1(string, color, figlet=False):
     if colored:
@@ -81,7 +82,7 @@ try:
             'type': 'list',
             'name': 'operation',
             'message': 'What do you want to do?',
-            'choices': ['Find oldest videos on a topic', 'Scrape a Channel','Scrape a Single Playlist' ,'Load Your History','Most Watched Video','Early Viewed Video','Generate Download List'],
+            'choices': ['Find oldest videos on a topic', 'Scrape a Channel','Scrape a Single Playlist' ,'Load Your History','Most Watched Video','Early Viewed Video','Generate Download List','Download Videos using YoutubeDL'],
             'filter': lambda val: val.lower()
         },
         {
@@ -116,6 +117,13 @@ try:
             'message': 'Do you want to import your video_history into main table(tb_videos) too? ',
             'default': False,
             'when': lambda answers: answers['operation'] == 'load your history'
+        },
+        {
+            'type': 'list',
+            'name': 'Quality',
+            'message': 'What Quality you want to download? (Make sure videos are listed in "download.txt" file)',
+            'choices': ['4k/Best Available','1080p','720p','360p'],
+            'when': lambda answers: answers['operation'] == 'download videos using youtubedl'
         },
     ]
 
@@ -168,18 +176,43 @@ try:
         n = int(input())
         early_views(n)
 
-    elif answers['Download'] == 'Videos from a single Channel':
-        print("It will list videos that are marked 'Is-Good' and is present in your database")
-        chc = input("Please enter the channel ID \t")
-        print("Please enter, How many items the list will contain \n")
-        n = int(input())
-        download_n(chc,n)
-    elif answers['Download'] == 'Videos from entire database':
-        print("It will list videos that are marked 'Is-Good' and is present in your database")
-        chc = ''
-        print("Please enter, How many items the list will contain \n")
-        n = int(input())
-        download_n(chc,n)
+    elif answers['operation'] == 'generate download list':
+        if answers['Download'] == 'Videos from a single Channel':
+            print("It will list videos that are marked 'Is-Good' and is present in your database")
+            chc = input("Please enter the channel ID \t")
+            print("Please enter, How many items the list will contain \n")
+            n = int(input())
+            download_n(chc,n)
+        elif answers['Download'] == 'Videos from entire database':
+            print("It will list videos that are marked 'Is-Good' and is present in your database")
+            chc = ''
+            print("Please enter, How many items the list will contain \n")
+            n = int(input())
+            download_n(chc,n)
+    elif answers['operation'] == 'download videos using youtubedl':
+        print("\nIt will download all the videos that are listed in download.txt")
+        print("Do you want to replace file names (_ in place of space) and convert thumbnail images (from WEBP to JPEG) ?\n")
+        chc2 = input("Please enter Y/N \t")
+        if chc2 == 'Y' or chc2 == 'Yes':
+            if answers['Quality'] == '4k/Best Available':
+                download_files('4k')
+            elif answers['Quality'] == '1080p':
+                download_files(1080)
+            elif answers['Quality'] == '720p':
+                download_files(720)
+            elif answers['Quality'] == '360p':
+                download_files(360)
+            replace2('D:\Youtube')
+            convertWebp2jpgInDirectory('D:\Youtube')
+        else:
+            if answers['Quality'] == '4k/Best Available':
+                download_files('4k')
+            elif answers['Quality'] == '1080p':
+                download_files(1080)
+            elif answers['Quality'] == '720p':
+                download_files(720)
+            elif answers['Quality'] == '360p':
+                download_files(360)
 
 except Exception as e:
     print(e)
