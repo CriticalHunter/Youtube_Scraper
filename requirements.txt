@@ -1,4 +1,4 @@
-﻿astroid==2.4.2
+astroid==2.4.2
 atomicwrites==1.4.0
 attrs==20.3.0
 beautifulsoup4==4.9.3
