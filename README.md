@@ -74,7 +74,7 @@ Install this library in a [virtualenv](https://virtualenv.pypa.io/en/latest/) us
 ```
 pip3 install virtualenv
 virtualenv venv
-venv/bin/activate
+. venv/bin/activate
 pip3 install -r requirements.txt
 ```
 
