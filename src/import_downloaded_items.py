@@ -1,6 +1,7 @@
 from pathlib import Path
 import subprocess, os,re
-
+#SELECT * FROM tb_videos WHERE Video_ID IN (SELECT Video_ID FROM yt_downloaded) ORDER BY Is_Seen
+# Sanity Check
 from os import listdir
 from os.path import isfile, join
 import sqlite3
@@ -12,7 +13,7 @@ def update_local(vid_path):
     vid_path1 = '"'+vid_path+'"'
     command = "./ffmpeg -i "+vid_path1+" -hide_banner"
     try:
-        with open('log1.txt', "w",encoding='utf-8') as outfile:
+        with open('log1.txt', "w",encoding='utf-8') as outfile:                 #latin-1
             subprocess.run(command, stderr=subprocess.STDOUT,stdout=outfile)
     except Exception as e:
         print(e)
@@ -58,6 +59,9 @@ def import_vids():
             if file.endswith(("mp4", "mkv", "flv", "wmv", "avi", "mpg", "mpeg")):
                 vid_path = os.path.join(r, file)
                 vid_id = vid_path[-15:-4]
+                with open ("skip_files.txt") as f:
+                    if vid_id in f.read():
+                        continue
                 vid_type = vid_path[-3:]
                 cur.execute("SELECT Video_ID FROM yt_downloaded WHERE Video_ID = ?",(vid_id,))
                 if (cur.fetchone()) is None:
@@ -76,7 +80,7 @@ def update_vids():
                     WHERE Video_ID IN (SELECT Video_ID FROM tb_videos))")
         conn.commit()                                               
         conn.close()
-    is_in_main()
+    # is_in_main()
     for i in range(2000):
         conn = sqlite3.connect('C:\\Users\\Sambit\\Desktop\\Projects\\Youtube\\Youtube_Scraper\\youtube.db')              
         cur = conn.cursor() 
@@ -96,6 +100,7 @@ def update_vids():
         conn.close()
 
         print('Parsing Downloaded Videos :',(i*50),' / ',tot[0],end="\r")
+        print(' ')
         youtube_instance = api_key()
         youtube_instance.get_api_key()
         youtube = youtube_instance.get_youtube()
@@ -103,7 +108,7 @@ def update_vids():
         conn = sqlite3.connect('youtube.db')              
         cur = conn.cursor()
         for item in result:
-            print(item)
+            print('New Item added successfully :',item)
             cur.execute("UPDATE tb_videos SET Is_Downloaded = 1 WHERE Video_ID = ?",(item,))
             cur.execute("UPDATE tb_videos SET Is_Seen = 1 WHERE Video_ID = ?",(item,))
             cur.execute("UPDATE tb_videos SET Worth = 1 WHERE Video_ID = ?",(item,))

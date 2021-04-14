@@ -20,7 +20,7 @@ def create_new():
         Is_Deleted INTEGER,
         Deleted_Videos INTEGER,
         Downloaded_Videos INTEGER,
-        Folder_Size_GB INTEGER,
+        Folder_Size_GB REAL,
         Channel_last_Scraped TEXT,
         Auto_Update INTEGER,
         Description TEXT
@@ -43,7 +43,7 @@ def create_new():
         Is_Removed INTEGER,
         Deleted_Videos INTEGER,
         Downloaded_Videos INTEGER,
-        Folder_Size_GB INTEGER,
+        Folder_Size_GB REAL,
         Playlist_last_Scraped TEXT,
         Auto_Update INTEGER
     )
@@ -89,7 +89,7 @@ def create_new():
         Video_ID TEXT PRIMARY KEY,
         Resolution TEXT,
         Raw_Size INTEGER,
-        Size TEXT,
+        Size REAL,
         vid_type TEXT,
         FPS TEXT,
         bitrate,
@@ -131,7 +131,7 @@ def migrate():
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Is_Deleted INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Deleted_Videos INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Downloaded_Videos INTEGER")
-        cur.execute("ALTER TABLE tb_channels ADD COLUMN Folder_Size_GB INTEGER")
+        cur.execute("ALTER TABLE tb_channels ADD COLUMN Folder_Size_GB REAL")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Channel_last_Scraped TEXT")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Auto_Update INTEGER")
         cur.execute("ALTER TABLE tb_channels ADD COLUMN Description TEXT")
@@ -159,7 +159,7 @@ def migrate():
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Is_Removed INTEGER")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Deleted_Videos INTEGER")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Downloaded_Videos INTEGER")
-        cur.execute("ALTER TABLE tb_playlists ADD COLUMN Folder_Size_GB INTEGER")
+        cur.execute("ALTER TABLE tb_playlists ADD COLUMN Folder_Size_GB REAL")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Playlist_last_Scraped TEXT")
         cur.execute("ALTER TABLE tb_playlists ADD COLUMN Auto_Update INTEGER")
         cur.execute("ALTER TABLE tb_playlists RENAME COLUMN Item_Count TO Current_Video_Count")
@@ -200,7 +200,7 @@ def migrate():
         Video_ID TEXT PRIMARY KEY,
         Resolution TEXT,
         Raw_Size INTEGER,
-        Size TEXT,
+        Size REAL,
         vid_type TEXT,
         FPS TEXT,
         bitrate,

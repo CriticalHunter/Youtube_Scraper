@@ -1,4 +1,14 @@
 from get_api_key import api_key
+import argparse
+import os
+
+parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,\
+                                description='Get CHannel ID for CHannel User Name, Hopefully!!!')
+parser.add_argument("User", help='Enter Channel User Name')
+args = parser.parse_args()
+
+
+
 def get_channel_id(youtube,ch_name):
     request = youtube.channels().list(
             part="snippet,contentDetails,statistics",
@@ -30,4 +40,4 @@ if __name__ == "__main__":
     youtube_instance = api_key()
     youtube_instance.get_api_key()
     youtube = youtube_instance.get_youtube()
-    get_channel_id(youtube,'JDCav24')
+    get_channel_id(youtube,args.User)
