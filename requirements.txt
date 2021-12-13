@@ -18,7 +18,7 @@ idna==2.10
 iniconfig==1.1.1
 isort==5.7.0
 lazy-object-proxy==1.4.3
-lxml==4.6.3
+lxml==4.6.5
 mccabe==0.6.1
 packaging==20.8
 pluggy==0.13.1
