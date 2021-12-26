@@ -27,8 +27,12 @@ def create_new():
     )
 
         """)
-
-
+    
+    cur.execute("""CREATE TABLE IF NOT EXISTS tb_error (
+        Channel_ID TEXT NOT NULL
+    )
+    """)
+    
     cur.execute("""CREATE TABLE IF NOT EXISTS tb_playlists(
         Playlist_ID TEXT PRIMARY KEY,
         Playlist_title TEXT,
