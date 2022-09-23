@@ -23,7 +23,7 @@ mccabe==0.6.1
 packaging==20.8
 pluggy==0.13.1
 prompt-toolkit==1.0.14
-protobuf==3.14.0
+protobuf==3.18.3
 py==1.10.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
