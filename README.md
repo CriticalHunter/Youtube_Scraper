@@ -1,3 +1,8 @@
+There was an inactivity of more than 2 years on this project.
+I am achieving this due to multiple reasons.
+Yet I will create a separate private repo for this and will work on adding new metrics and visualizations although at a slow pace.
+If it ends nice will merge that with this repo.
+
 # Youtube_scrape
 
 <img src="https://github.com/CriticalHunter/Youtube_Scraper/blob/master/Assets/title.jpg" >
