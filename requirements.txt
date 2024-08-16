@@ -28,7 +28,7 @@ py==1.10.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pyfiglet==0.8.post1
-Pygments==2.8.1
+Pygments==2.15.0
 PyInquirer==1.0.3
 pylint==2.6.0
 pyparsing==2.4.7
