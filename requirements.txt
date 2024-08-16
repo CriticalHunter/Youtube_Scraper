@@ -35,7 +35,7 @@ pyparsing==2.4.7
 pytest==6.2.1
 pytz==2020.4
 regex==2020.11.13
-requests==2.25.1
+requests==2.32.2
 rsa==4.7
 six==1.15.0
 soupsieve==2.1
