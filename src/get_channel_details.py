@@ -33,7 +33,14 @@ def get_channel_details(youtube,channel_id,single=False,playlistID='',ec=False):
         flag3 = flag3[0]
     if flag1 == False and flag2 == False:
         print("Channel ID not valid")
-        sys.exit()
+        params = (Channel_Id)
+        conn = sqlite3.connect('youtube.db')              
+        cur = conn.cursor()
+        cur.execute("INSERT OR REPLACE INTO tb_error VALUES (?)" , [Channel_Id])
+        conn.commit()                                               # Push the data into database
+        conn.close()
+        print("Invalid ID saved to tb_error")
+        sys.exit(0)
     if flag1 == False and flag2 == True and flag3 == 1:
         print("Channel was already Deleted")
         conn.commit()                                               # Push the data into database
